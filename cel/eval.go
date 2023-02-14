@@ -7,12 +7,15 @@ import (
 	"qingmu/cel/proto"
 	"qingmu/httpclient"
 	"qingmu/pocstruct"
+	"qingmu/report"
 	"qingmu/utils"
 	"strings"
 )
 
 //执行yaml
-func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
+func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Report, []string) {
+
+	rep := report.Report{}
 
 	//pocRuleMap := make(map[string]bool) //用于xray动态函数注入，如：r0() && r1() 进行cel计算
 	c := InitCelOptions()
@@ -20,6 +23,9 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
 		c.UpdateSetCompileOptions(poc.Set) //set基础类型注入
 
 	}
+
+	rep.Title = addr + "存在" + poc.Name + "漏洞" //报告title
+	rep.Detail = poc.Detail
 
 	celVarMap := SetCelVar(c, poc) //获取set中的全局变量
 
@@ -29,12 +35,6 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
 
 		rule := poc.Rules[key]
 		outputkeys := rulekeysmap[key] //获取保存output 中的顺序
-
-		//f := EvalRule
-
-		//r := EvalRule(addr, &rule, c, celVarMap, outputkeys)
-
-		//fmt.Println("正在执行", key)
 
 		//动态函数注入
 		// 传递变量，动态向cel注入函数
@@ -47,7 +47,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
 	if err != nil {
 		log.Fatalln("初始化cel环境错误", err)
 		//pocresult <- false
-		return false
+		return false, rep, rulekeysmap["rules"]
 	}
 
 	//pocstruct.Expression = strings.ReplaceAll(pocstruct.Expression, "()", "('')")
@@ -57,7 +57,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
 	if err != nil {
 		log.Println("执行Poc.Expression错误：", err)
 		//pocresult <- false
-		return false
+		return false, rep, rulekeysmap["rules"]
 	}
 
 	outvalue, isbool := out.Value().(bool)
@@ -65,12 +65,12 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
 	if !isbool {
 		log.Println("执行poc.Expression结果不为bool值:", out.Value())
 		//pocresult <- false
-		return false
+		return false, rep, rulekeysmap["rules"]
 	}
 	//fmt.Println()
 
 	//pocresult <- outvalue
-	return outvalue
+	return outvalue, rep, rulekeysmap["rules"]
 
 }
 
@@ -99,8 +99,15 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 		rule.Request.Body = strings.ReplaceAll(strings.TrimSpace(rule.Request.Body), "{{"+k1+"}}", value)
 	}
 
-	resp, err := httpclient.HttpRequest(addr, &rule.Request)
+	resp, _, err := httpclient.HttpRequest(addr, &rule.Request)
 	defer fasthttp.ReleaseResponse(resp) //在此释放resp资源
+
+	//reqresp := report.ReqResp{
+	//	Req:  oreq.String(),
+	//	Resp: resp.String(),
+	//}
+	//rep.Vul[key] = report.ReqResp{}
+
 	if err != nil {
 
 		log.Fatalln("请求失败：", err)

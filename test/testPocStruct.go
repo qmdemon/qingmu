@@ -20,9 +20,9 @@ var (
 )
 
 func Init() {
-	flag.StringVar(&target, "target", "", "扫描目标")
+	flag.StringVar(&target, "target", "http://httpbin.org", "扫描目标")
 	flag.StringVar(&linkfile, "linkfile", "", "目标地址文件")
-	flag.StringVar(&pocfile, "pocfile", "", "poc文件")
+	flag.StringVar(&pocfile, "pocfile", "poc/test/httpbin-test.yml", "poc文件")
 	flag.StringVar(&poctype, "poctype", "/", "poc类型")
 	flag.IntVar(&tnum, "tnum", 10, "扫描target协(线)程数量")
 	flag.IntVar(&pnum, "pnum", 10, "扫描poc协(线)程数量")
@@ -136,10 +136,13 @@ func runpoc(targets chan string, pocresult chan string, pocs chan string) {
 			if err != nil {
 				log.Fatalln("解析yml错误：", err)
 			}
-			success := cel.EvalPoc(t, poc, p)
+			success, rep, order := cel.EvalPoc(t, poc, p)
 
 			if success {
 				pocresult <- fmt.Sprintf("%s 存在 %s 漏洞", t, poc.Name)
+				fmt.Println(rep.Title)
+				fmt.Println(order)
+				//report.OutPutDocx(rep, order)
 			} else {
 				pocresult <- fmt.Sprintf("%s 不存在 %s 漏洞", t, poc.Name)
 			}

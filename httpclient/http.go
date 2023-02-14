@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response, error) {
+func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response, *fasthttp.Request, error) {
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path
@@ -45,7 +45,7 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response
 
 	if err := client.Do(req, resp); err != nil {
 		log.Println("请求失败:", err.Error())
-		return resp, err
+		return resp, req, err
 	}
 
 	//if resp.StatusCode() == 502 {
@@ -53,7 +53,7 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response
 	//	fmt.Println(resp)
 	//}
 
-	return resp, nil
+	return resp, req, nil
 
 }
 
