@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"qingmu/util"
+	"qingmu/utils"
 )
 
 func main() {
 
 	filename := "test/httpbin-test.yml"
 
-	a := util.RuleKeys(filename)
+	a := utils.RuleKeys(filename)
 
 	fmt.Println(a)
 
