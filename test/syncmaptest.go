@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"qingmu/poc"
+	"qingmu/pocstruct"
 )
 
 func main() {
 
-	poc, err := poc.LoadPoc("httpbin-test.yml")
+	poc, err := pocstruct.LoadPoc("httpbin-test.yml")
 	if err != nil {
 		log.Fatalln("解析yml错误：", err)
 	}

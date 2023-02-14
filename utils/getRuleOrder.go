@@ -1,4 +1,4 @@
-package util
+package utils
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// 获取yaml poc 执行顺序
+// 获取yaml pocstruct 执行顺序
 func RuleKeys(filename string) map[string][]string {
 
 	rulemap := make(map[string][]string) //生成一个用于保存执行流程的map

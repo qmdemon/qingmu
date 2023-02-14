@@ -7,11 +7,11 @@ import (
 	"github.com/valyala/fasthttp"
 	"log"
 	"net/http"
-	"qingmu/poc"
+	"qingmu/pocstruct"
 	"strings"
 )
 
-func HttpRequest(addr string, pocRequest *poc.Request) (*fasthttp.Response, error) {
+func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response, error) {
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path
@@ -67,7 +67,7 @@ func GetResponseHeaders(fasthttpresp string) (http.Header, error) {
 	return resp.Header, err
 }
 
-func NetHttpReq(addr string, pocRequest *poc.Request) (*http.Request, error) {
+func NetHttpReq(addr string, pocRequest *pocstruct.Request) (*http.Request, error) {
 
 	addr = strings.TrimSpace(addr)
 

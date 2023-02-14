@@ -1,0 +1,37 @@
+name: httpbin.org接口测试13
+manual: true
+transport: http
+set:
+  var1: base64('abc')
+  var2: md5('123456')
+rules:
+  post:
+    request:
+      cache: true
+      method: POST
+      path: /post?key={{var1}}
+      headers:
+        user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        Content-Type: application/json
+        token: qmteseteaajfdfjkdjfk
+      body: '{"username":"test","password":"123456"}'
+    expression: response.status == 200
+  get:
+    request:
+      cache: true
+      method: GET
+      path: /get?key={{var2}}
+      headers:
+        user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        tst: '{{var1}}'
+    expression: response.status == 200
+    output:
+      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
+      access_code: response.headers["Content-Type"]
+#      title: |
+#        search["title"]
+expression: get() && post() && get() && post()
+detail:
+  author: Hzllaga
+  links:
+    - https://github.com/th3gundy/CVE-2019-7192_QNAP_Exploit

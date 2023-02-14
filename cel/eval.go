@@ -6,13 +6,13 @@ import (
 	"log"
 	"qingmu/cel/proto"
 	"qingmu/httpclient"
-	"qingmu/poc"
-	"qingmu/util"
+	"qingmu/pocstruct"
+	"qingmu/utils"
 	"strings"
 )
 
 //执行yaml
-func EvalPoc(addr string, poc *poc.Poc, filename string, pocresult chan bool) {
+func EvalPoc(addr string, poc *pocstruct.Poc, filename string) bool {
 
 	//pocRuleMap := make(map[string]bool) //用于xray动态函数注入，如：r0() && r1() 进行cel计算
 	c := InitCelOptions()
@@ -23,7 +23,7 @@ func EvalPoc(addr string, poc *poc.Poc, filename string, pocresult chan bool) {
 
 	celVarMap := SetCelVar(c, poc) //获取set中的全局变量
 
-	rulekeysmap := util.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
+	rulekeysmap := utils.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
 
 	for _, key := range rulekeysmap["rules"] {
 
@@ -46,35 +46,36 @@ func EvalPoc(addr string, poc *poc.Poc, filename string, pocresult chan bool) {
 	env, err := InitCelEnv(&c)
 	if err != nil {
 		log.Fatalln("初始化cel环境错误", err)
-		pocresult <- false
-		//return false
+		//pocresult <- false
+		return false
 	}
 
-	//poc.Expression = strings.ReplaceAll(poc.Expression, "()", "('')")
+	//pocstruct.Expression = strings.ReplaceAll(pocstruct.Expression, "()", "('')")
 	//fmt.Println("开始执行exp")
 
 	out, err := Evaluate(env, poc.Expression, celVarMap)
 	if err != nil {
 		log.Println("执行Poc.Expression错误：", err)
-		pocresult <- false
-		//return false
+		//pocresult <- false
+		return false
 	}
 
 	outvalue, isbool := out.Value().(bool)
 
 	if !isbool {
 		log.Println("执行poc.Expression结果不为bool值:", out.Value())
-		pocresult <- false
+		//pocresult <- false
+		return false
 	}
 	//fmt.Println()
 
-	pocresult <- outvalue
-	//return true
+	//pocresult <- outvalue
+	return outvalue
 
 }
 
 // 执行单个rule
-func EvalRule(addr string, rule *poc.Rule, c CustomLib, celVarMap map[string]interface{}, outputkeys []string) bool {
+func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, outputkeys []string) bool {
 
 	//var mux sync.RWMutex
 
@@ -185,7 +186,7 @@ func EvalRule(addr string, rule *poc.Rule, c CustomLib, celVarMap map[string]int
 }
 
 // 执行set，获取poc全局变量
-func SetCelVar(c CustomLib, poc *poc.Poc) map[string]interface{} {
+func SetCelVar(c CustomLib, poc *pocstruct.Poc) map[string]interface{} {
 	env, err := InitCelEnv(&c)
 	if err != nil {
 		log.Fatalln("初始化cel环境错误", err)
@@ -253,11 +254,11 @@ func UrlTypeToString(u *proto.UrlType) string {
 }
 
 ////生产根据pocRuleMap 生产新的环境用于计算poc.Expression
-//func NewCelEnv(pocRuleMap map[string]bool, poc *poc.Poc) (*cel.Env, error) {
+//func NewCelEnv(pocRuleMap map[string]bool, pocstruct *pocstruct.Poc) (*cel.Env, error) {
 //	c := InitCelOptions(pocRuleMap)
 //
-//	if poc.Set != nil {
-//		c.UpdateSetCompileOptions(poc.Set)
+//	if pocstruct.Set != nil {
+//		c.UpdateSetCompileOptions(pocstruct.Set)
 //
 //	}
 //

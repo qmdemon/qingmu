@@ -1,11 +1,11 @@
-package poc
+package pocstruct
 
 import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
-// xray poc
+// xray pocstruct
 type Poc struct {
 	Name       string            `yaml:"name"`
 	Set        map[string]string `yaml:"set"`
