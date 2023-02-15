@@ -60,7 +60,7 @@ func Getpoclist(poctype string) map[string]*pocstruct.Poc {
 // 获取poc目录下的所有文件
 func Getfilepath(poctype string) []string {
 
-	poctype = "poc" + strings.TrimSuffix(poctype, string(os.PathSeparator))
+	poctype = "poc/" + strings.TrimSuffix(poctype, string(os.PathSeparator))
 	//fmt.Println(poctype)
 
 	infos, err := ioutil.ReadDir(poctype)

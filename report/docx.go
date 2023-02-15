@@ -4,12 +4,17 @@ import (
 	"fmt"
 	"github.com/gingfrederik/docx"
 	"strings"
+	"sync"
 )
 
-func OutPutDocx(rep Report, order []string) {
+func OutPutDocx(rep Report, wg *sync.WaitGroup) {
+	//rep := <-do
 	f := docx.NewFile()
 	f.AddParagraph().AddText(rep.Title).Size(20)
 	text := f.AddParagraph()
+
+	text.AddText("漏洞地址：")
+	text.AddText("\t" + rep.Addr + "\r\n").Color("0000ff")
 
 	if rep.Detail.Links != nil {
 		text.AddText("参考链接：")
@@ -26,20 +31,25 @@ func OutPutDocx(rep Report, order []string) {
 		text.AddText("\t" + rep.Detail.Version + "\r\n").Color("0000ff")
 	}
 
-	text.AddText("漏洞详情：\r\n").Size(15)
+	text.AddText("\r\n漏洞详情：\r\n").Size(15)
 
-	for i, key := range order {
-		text.AddText(fmt.Sprintf("第%d次请求:\r\n", i+1)).Color("ff0000")
+	for i, key := range rep.Vul {
+		text.AddText(fmt.Sprintf("发送第%d次请求:\r\n", i+1)).Color("ff0000")
+
 		//text.AddText("请求URL：\r\n")
 		//text.AddText("\t" + v.Url + "\r\n").Color("0000ff")
 		text.AddText("请求数据包：\r\n")
-		text.AddText(rep.Vul[key].Req + "\r\n").Color("0000ff")
+		text.AddText(key.Req + "\r\n").Color("0000ff")
 		text.AddText("请求响应包：\r\n")
-		text.AddText(rep.Vul[key].Resp + "\r\n").Color("0000ff")
+		text.AddText(key.Resp + "\r\n").Color("0000ff")
+		text.AddText("漏洞存在判断条件：\r\n")
+		text.AddText(key.Expression + "\r\n").Color("0000ff")
 		text.AddText("结果：\r\n")
 		text.AddText("\t" + fmt.Sprintf("%v", "存在漏洞") + "\r\n").Color("0000ff")
 	}
 
-	f.Save(rep.Title + ".docx")
+	f.Save("output/" + strings.ReplaceAll(rep.Title, "/", "") + ".docx")
+
+	wg.Done()
 
 }

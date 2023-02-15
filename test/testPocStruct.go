@@ -7,7 +7,9 @@ import (
 	"os"
 	"qingmu/cel"
 	"qingmu/pocstruct"
+	"qingmu/report"
 	"qingmu/utils"
+	"sync"
 )
 
 var (
@@ -20,9 +22,9 @@ var (
 )
 
 func Init() {
-	flag.StringVar(&target, "target", "http://httpbin.org", "扫描目标")
+	flag.StringVar(&target, "target", "", "扫描目标")
 	flag.StringVar(&linkfile, "linkfile", "", "目标地址文件")
-	flag.StringVar(&pocfile, "pocfile", "poc/test/httpbin-test.yml", "poc文件")
+	flag.StringVar(&pocfile, "pocfile", "", "poc文件")
 	flag.StringVar(&poctype, "poctype", "/", "poc类型")
 	flag.IntVar(&tnum, "tnum", 10, "扫描target协(线)程数量")
 	flag.IntVar(&pnum, "pnum", 10, "扫描poc协(线)程数量")
@@ -49,6 +51,7 @@ func main() {
 			//err := error()
 
 			poclist = utils.Getfilepath(poctype)
+			//fmt.Println(poclist)
 
 			// 要传递多个target，使一个target匹配一个poc，否则只会执行第一个poc
 			for i := 0; i < len(poclist); i++ {
@@ -92,6 +95,15 @@ func main() {
 	pocresult := make(chan string)
 	targets := make(chan string, tnum)
 	pocs := make(chan string, pnum)
+	//do := make(chan report.Report)
+	var wg sync.WaitGroup
+
+	// 执行poc
+	for i := 0; i < cap(targets); i++ {
+		for j := 0; j < cap(pocs); j++ {
+			go runpoc(targets, pocresult, pocs, &wg)
+		}
+	}
 
 	// 添加地址扫描队列
 	go func() {
@@ -107,43 +119,46 @@ func main() {
 		}
 	}()
 
-	// 执行poc
-	for i := 0; i < cap(targets); i++ {
-		for j := 0; j < cap(pocs); j++ {
-			go runpoc(targets, pocresult, pocs)
-		}
-	}
-
 	// 输出结果
 	for i := 0; i < len(links); i++ {
 		result := <-pocresult
 		fmt.Println(result)
+		//rep := <-do
+
 	}
+
+	wg.Wait()
 
 	close(pocresult)
 	close(targets)
 	close(pocs)
+	//close(do)
 
 }
 
-func runpoc(targets chan string, pocresult chan string, pocs chan string) {
+func runpoc(targets chan string, pocresult chan string, pocs chan string, wg *sync.WaitGroup) {
 
 	for t := range targets {
 		for p := range pocs {
 
 			//fmt.Println(p)
+
 			poc, err := pocstruct.LoadPoc(p)
 			if err != nil {
 				log.Fatalln("解析yml错误：", err)
 			}
-			success, rep, order := cel.EvalPoc(t, poc, p)
+			success, rep := cel.EvalPoc(t, poc, p)
 
 			if success {
+				wg.Add(1)
 				pocresult <- fmt.Sprintf("%s 存在 %s 漏洞", t, poc.Name)
-				fmt.Println(rep.Title)
-				fmt.Println(order)
-				//report.OutPutDocx(rep, order)
+
+				go report.OutPutDocx(rep, wg)
+
+				//do <- rep
+				//time.Sleep(time.Second * 3)
 			} else {
+
 				pocresult <- fmt.Sprintf("%s 不存在 %s 漏洞", t, poc.Name)
 			}
 		}

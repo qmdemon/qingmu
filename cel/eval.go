@@ -13,7 +13,7 @@ import (
 )
 
 //执行yaml
-func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Report, []string) {
+func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Report) {
 
 	rep := report.Report{}
 
@@ -23,8 +23,9 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 		c.UpdateSetCompileOptions(poc.Set) //set基础类型注入
 
 	}
-
+	//
 	rep.Title = addr + "存在" + poc.Name + "漏洞" //报告title
+	rep.Addr = addr
 	rep.Detail = poc.Detail
 
 	celVarMap := SetCelVar(c, poc) //获取set中的全局变量
@@ -39,7 +40,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 		//动态函数注入
 		// 传递变量，动态向cel注入函数
 		// 可以避免你无效请求
-		c.UpdateFunctionOptions(key, addr, &rule, celVarMap, outputkeys)
+		c.UpdateFunctionOptions(key, addr, &rule, celVarMap, outputkeys, &rep)
 
 	}
 
@@ -47,7 +48,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	if err != nil {
 		log.Fatalln("初始化cel环境错误", err)
 		//pocresult <- false
-		return false, rep, rulekeysmap["rules"]
+		return false, rep
 	}
 
 	//pocstruct.Expression = strings.ReplaceAll(pocstruct.Expression, "()", "('')")
@@ -57,7 +58,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	if err != nil {
 		log.Println("执行Poc.Expression错误：", err)
 		//pocresult <- false
-		return false, rep, rulekeysmap["rules"]
+		return false, rep
 	}
 
 	outvalue, isbool := out.Value().(bool)
@@ -65,17 +66,17 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	if !isbool {
 		log.Println("执行poc.Expression结果不为bool值:", out.Value())
 		//pocresult <- false
-		return false, rep, rulekeysmap["rules"]
+		return false, rep
 	}
 	//fmt.Println()
 
 	//pocresult <- outvalue
-	return outvalue, rep, rulekeysmap["rules"]
+	return outvalue, rep
 
 }
 
 // 执行单个rule
-func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, outputkeys []string) bool {
+func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, outputkeys []string, rep *report.Report) bool {
 
 	//var mux sync.RWMutex
 
@@ -99,14 +100,15 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 		rule.Request.Body = strings.ReplaceAll(strings.TrimSpace(rule.Request.Body), "{{"+k1+"}}", value)
 	}
 
-	resp, _, err := httpclient.HttpRequest(addr, &rule.Request)
+	resp, err := httpclient.HttpRequest(addr, &rule.Request, rule.Expression, rep)
 	defer fasthttp.ReleaseResponse(resp) //在此释放resp资源
 
 	//reqresp := report.ReqResp{
 	//	Req:  oreq.String(),
 	//	Resp: resp.String(),
 	//}
-	//rep.Vul[key] = report.ReqResp{}
+	//rep.Vul[key] = reqresp
+	//rep.Set(key, "", resp.String())
 
 	if err != nil {
 

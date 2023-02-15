@@ -31,7 +31,7 @@ func RuleKeys(filename string) map[string][]string {
 
 	for {
 
-		str, err := reader.ReadString('\n') //读取到一个换行符就结束
+		str, err := reader.ReadString('\n') //读取到一个换
 		//str = strings.TrimSpace(str)
 		if err == io.EOF { //io.EOF 表示文件的结尾
 			break

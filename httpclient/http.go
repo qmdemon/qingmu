@@ -8,10 +8,11 @@ import (
 	"log"
 	"net/http"
 	"qingmu/pocstruct"
+	"qingmu/report"
 	"strings"
 )
 
-func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response, *fasthttp.Request, error) {
+func HttpRequest(addr string, pocRequest *pocstruct.Request, Expression string, rep *report.Report) (*fasthttp.Response, error) {
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path
@@ -19,7 +20,7 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response
 	//fmt.Println(url)
 
 	req := fasthttp.AcquireRequest()
-	defer fasthttp.ReleaseRequest(req) // 用完需要释放资源
+	//defer fasthttp.ReleaseRequest(req) // 用完需要释放资源
 
 	req.Header.SetMethod(pocRequest.Method)
 
@@ -45,15 +46,12 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request) (*fasthttp.Response
 
 	if err := client.Do(req, resp); err != nil {
 		log.Println("请求失败:", err.Error())
-		return resp, req, err
+		return resp, err
 	}
+	//fmt.Println(resp.StatusCode())
+	rep.Set(req.String(), resp.String(), Expression)
 
-	//if resp.StatusCode() == 502 {
-	//	fmt.Println(req)
-	//	fmt.Println(resp)
-	//}
-
-	return resp, req, nil
+	return resp, nil
 
 }
 

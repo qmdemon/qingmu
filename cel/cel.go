@@ -13,6 +13,7 @@ import (
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 	"qingmu/cel/proto"
 	"qingmu/pocstruct"
+	"qingmu/report"
 	"regexp"
 	"strings"
 )
@@ -210,7 +211,7 @@ func (c *CustomLib) UpdateOutputCompileOptions(args map[string]interface{}) {
 //UpdateFunctionOptions 用来预先处理rule的键名，加载到env中
 //后续处理类似 r0()&&r1()这类的expression，可以索引到env中执行
 //动态函数注入
-func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstruct.Rule, celVarMap map[string]interface{}, outputkeys []string) {
+func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstruct.Rule, celVarMap map[string]interface{}, outputkeys []string, rep *report.Report) {
 	//expression:=v.Expression
 	//declarations
 	dec := decls.NewFunction(name, decls.NewOverload(name, []*exprpb.Type{}, decls.Bool))
@@ -220,7 +221,7 @@ func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstr
 		Function: func(values ...ref.Val) ref.Val {
 			//匿名函数
 			f := func() bool {
-				return EvalRule(addr, rule, *c, celVarMap, outputkeys)
+				return EvalRule(addr, rule, *c, celVarMap, outputkeys, rep)
 			}
 			//执行 EvalRule
 			isTrue := f()

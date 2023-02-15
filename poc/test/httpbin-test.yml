@@ -20,17 +20,17 @@ rules:
     request:
       cache: true
       method: GET
-      path: /get?key={{var2}}
+      path: /ge123t?key={{var2}}
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
         tst: '{{var1}}'
-    expression: response.status == 200
+    expression: response.status == 404
     output:
       search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
       access_code: response.headers["Content-Type"]
-#      title: |
-#        search["title"]
-expression: get() && post() && get() && post()
+      title: |
+        search["title"]
+expression: get() && post()
 detail:
   author: Hzllaga
   links:
