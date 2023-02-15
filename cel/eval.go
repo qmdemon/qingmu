@@ -17,10 +17,12 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 
 	rep := report.Report{}
 
+	rulekeysmap := utils.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
+
 	//pocRuleMap := make(map[string]bool) //用于xray动态函数注入，如：r0() && r1() 进行cel计算
 	c := InitCelOptions()
 	if poc.Set != nil {
-		c.UpdateSetCompileOptions(poc.Set) //set基础类型注入
+		c.UpdateSetCompileOptions(poc.Set, rulekeysmap["set"]) //set基础类型注入
 
 	}
 	//
@@ -29,8 +31,6 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	rep.Detail = poc.Detail
 
 	celVarMap := SetCelVar(c, poc) //获取set中的全局变量
-
-	rulekeysmap := utils.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
 
 	for _, key := range rulekeysmap["rules"] {
 

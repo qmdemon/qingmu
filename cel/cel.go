@@ -175,8 +175,10 @@ func (c *CustomLib) ProgramOptions() []cel.ProgramOption {
 }
 
 // set 类型注入
-func (c *CustomLib) UpdateSetCompileOptions(args map[string]string) {
-	for k, v := range args {
+func (c *CustomLib) UpdateSetCompileOptions(set map[string]string, setkeys []string) {
+	for _, k := range setkeys {
+
+		v := set[k]
 		// 在执行之前是不知道变量的类型的，所以统一声明为字符型
 		// 所以randomInt虽然返回的是int型，在运算中却被当作字符型进行计算，需要重载string_*_string
 		var d *exprpb.Decl

@@ -15,6 +15,7 @@ func RuleKeys(filename string) map[string][]string {
 
 	var rulekeys []string //用于保存rule执行流程
 	var output []string   // 用于保存output 执行流程
+	var setkeys []string  // 用于保存set 执行流程
 	var a string          // 用于保存当前rule
 
 	file, err := os.Open(filename)
@@ -29,6 +30,8 @@ func RuleKeys(filename string) map[string][]string {
 
 	var outstart = false
 
+	var setstart = false
+
 	for {
 
 		str, err := reader.ReadString('\n') //读取到一个换
@@ -38,12 +41,26 @@ func RuleKeys(filename string) map[string][]string {
 
 		}
 
+		if strings.Index(str, "set:") == 0 {
+			setstart = true
+		}
+
 		if strings.Index(str, "rules:") == 0 {
 			rulestart = true
+			setstart = false
 		}
 
 		if strings.Index(str, "expression:") == 0 {
 			rulestart = false
+		}
+
+		if setstart {
+			if strings.Index(str, "  ") == 0 && str[2] != 32 {
+				str = strings.TrimSpace(str)
+
+				setkeys = append(setkeys, str[:len(str)-1])
+			}
+
 		}
 
 		if rulestart {
@@ -75,6 +92,7 @@ func RuleKeys(filename string) map[string][]string {
 	}
 
 	rulemap["rules"] = rulekeys
+	rulemap["set"] = setkeys
 
 	return rulemap
 
