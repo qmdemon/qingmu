@@ -5,35 +5,31 @@ set:
   var1: base64('abc')
   var2: md5('123456')
 rules:
-  post:
+  get1:
     request:
       cache: true
-      method: POST
-      path: /post?key={{var1}}
+      method: GET
+      path: /login/index
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
         Content-Type: application/json
         token: qmteseteaajfdfjkdjfk
-      body: '{"username":"test","password":"123456"}'
     expression: response.status == 200
     output:
-
-  get:
+      cookie: base64(response.headers["Set-Cookie"])
+  get2:
     request:
       cache: true
       method: GET
-      path: /ge123t?key={{var2}}
+      path: /login/index?var1={{var2}}&&var2={{var2}}&&cookie={{cookie}}
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
         tst: '{{var1}}'
-    expression: response.status == 404
+    expression: response.status == 200
     output:
       search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
       access_code: response.headers["Content-Type"]
-      title: |
-        search["title"]
-      adfbv: access_code
-expression: get() && post()
+expression: get1() && get2()
 detail:
   author: Hzllaga
   links:

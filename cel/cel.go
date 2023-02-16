@@ -199,6 +199,8 @@ func (c *CustomLib) UpdateOutputCompileOptions(args map[string]interface{}) {
 
 		var d *exprpb.Decl
 
+		//fmt.Println(v)
+
 		_, ok := v.(map[string]string)
 
 		if ok {

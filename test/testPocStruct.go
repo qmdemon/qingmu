@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"qingmu/cel"
+	"qingmu/global"
 	"qingmu/pocstruct"
 	"qingmu/report"
 	"qingmu/utils"
@@ -26,8 +27,11 @@ func Init() {
 	flag.StringVar(&linkfile, "linkfile", "", "目标地址文件")
 	flag.StringVar(&pocfile, "pocfile", "", "poc文件")
 	flag.StringVar(&poctype, "poctype", "/", "poc类型")
-	flag.IntVar(&tnum, "tnum", 10, "扫描target协(线)程数量")
+	flag.IntVar(&tnum, "tnum", 10, "扫描目标地址协(线)程数量")
 	flag.IntVar(&pnum, "pnum", 10, "扫描poc协(线)程数量")
+	flag.BoolVar(&global.IsShowPath, "showpath", false, "是否显示请求路径")
+	flag.BoolVar(&global.IsShowRequest, "showreq", false, "是否显示请求数据")
+	flag.BoolVar(&global.IsShowResponse, "showresp", false, "是否显示请求方法")
 
 	flag.Parse()
 }

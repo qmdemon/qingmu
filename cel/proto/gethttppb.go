@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"qingmu/httpclient"
+	"strings"
 )
 
 func GetResponse(resp *fasthttp.Response, req *http.Request) (*Response, error) {
@@ -21,10 +22,11 @@ func GetResponse(resp *fasthttp.Response, req *http.Request) (*Response, error) 
 		log.Println("获取responseheaders错误", err)
 		return &pbresp, err
 	}
-	pbresp.Headers = make(map[string]*Header)
+	pbresp.Headers = make(map[string]string)
 
 	for k, v := range respheaders {
-		pbresp.Headers[k] = &Header{Header: v}
+		pbresp.Headers[k] = strings.Join(v, "，")
+		//fmt.Println(k, v)
 	}
 	pbresp.Url = GetUrlType(req.URL)
 

@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"github.com/valyala/fasthttp"
 	"log"
 	"net/http"
+	"qingmu/global"
 	"qingmu/pocstruct"
 	"qingmu/report"
 	"strings"
@@ -16,8 +18,6 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request, Expression string, 
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path
-
-	//fmt.Println(url)
 
 	req := fasthttp.AcquireRequest()
 	//defer fasthttp.ReleaseRequest(req) // 用完需要释放资源
@@ -50,6 +50,15 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request, Expression string, 
 	}
 	//fmt.Println(resp.StatusCode())
 	rep.Set(req.String(), resp.String(), Expression)
+	if global.IsShowPath {
+		fmt.Println(pocRequest.Method, url)
+	}
+	if global.IsShowRequest {
+		fmt.Println(req.String())
+	}
+	if global.IsShowResponse {
+		fmt.Println(resp.String())
+	}
 
 	return resp, nil
 

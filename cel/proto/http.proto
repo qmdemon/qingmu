@@ -23,7 +23,7 @@ message Request {
 message Response {
   UrlType url = 1;
   int32 status = 2 ;
-  map<string,  Header> headers = 3;
+  map<string,  string> headers = 3;
   string content_type = 4;
   bytes body = 5;
 }
@@ -35,6 +35,4 @@ message Reverse {
   bool is_domain_name_server = 4;
 }
 
-message Header {
-  repeated string  header = 1;
-}
+
