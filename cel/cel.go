@@ -1040,12 +1040,12 @@ func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstr
 	function := &functions.Overload{
 		Operator: name,
 		Function: func(values ...ref.Val) ref.Val {
-			//匿名函数
-			f := func() bool {
+			//匿名函数，通过cel rule键进行注入，可以减少不必要的请求。
+			isTrue := func() bool {
 				return EvalRule(addr, rule, *c, celVarMap, outputkeys, rep)
-			}
+			}()
 			//执行 EvalRule
-			isTrue := f()
+
 			//if !isTrue {
 			//	fmt.Println(rule.Request.Path)
 			//}

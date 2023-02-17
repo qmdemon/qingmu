@@ -30,8 +30,8 @@ rules:
     output:
       search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
       access_code: response.headers["Content-Type"]
-      title: |
-        search["title"]
+#      title: |
+#        search["title"]
       adfbv: access_code
 expression: get() && post()
 detail:

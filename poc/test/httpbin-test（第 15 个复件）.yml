@@ -28,9 +28,9 @@ rules:
     output:
       search123: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
       access_code: response.headers["Content-Type"]
-      title: |
-        search123["title"]
-      b: a
+#      title: |
+#        search123["title"]
+#      b: a
 expression: get() && post() && get() && post()
 detail:
   author: Hzllaga

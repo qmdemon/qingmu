@@ -1,4 +1,4 @@
-name: httpbin.org接口测试1
+name: cookie测试
 manual: true
 transport: http
 set:

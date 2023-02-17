@@ -32,6 +32,7 @@ func OutPutDocx(rep Report, wg *sync.WaitGroup) {
 	}
 
 	text.AddText("\r\n漏洞详情：\r\n").Size(15)
+	text.AddText(fmt.Sprintf("一共发送%d次请求:\r\n", len(rep.Vul)))
 
 	for i, key := range rep.Vul {
 		text.AddText(fmt.Sprintf("发送第%d次请求:\r\n", i+1)).Color("ff0000")
