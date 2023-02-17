@@ -49,7 +49,7 @@ func OutPutDocx(rep Report, wg *sync.WaitGroup) {
 		text.AddText("\t" + fmt.Sprintf("%v", "存在漏洞") + "\r\n").Color("0000ff")
 	}
 
-	f.Save("output/" + strings.ReplaceAll(rep.Title, "/", "") + ".docx")
+	f.Save("output/" + strings.ReplaceAll(strings.ReplaceAll(rep.Title, "http://", "http__"), "https://", "https__") + ".docx")
 
 	wg.Done()
 

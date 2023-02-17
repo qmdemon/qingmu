@@ -149,7 +149,8 @@ func runpoc(targets chan string, pocresult chan string, pocs chan string, wg *sy
 
 			poc, err := pocstruct.LoadPoc(p)
 			if err != nil {
-				log.Fatalln("解析yml错误：", err)
+				log.Println("解析yml错误：", err)
+				continue
 			}
 			success, rep := cel.EvalPoc(t, poc, p)
 

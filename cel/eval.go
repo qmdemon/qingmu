@@ -46,7 +46,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 
 	env, err := InitCelEnv(&c)
 	if err != nil {
-		log.Fatalln("初始化cel环境错误", err)
+		log.Println("初始化cel环境错误", err)
 		//pocresult <- false
 		return false, rep
 	}
@@ -112,27 +112,31 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 
 	if err != nil {
 
-		log.Fatalln("请求失败：", err)
+		log.Println("请求失败：", err)
+		return false
 	}
 	//fmt.Println(resp.String())
 	req, err := httpclient.NetHttpReq(addr, &rule.Request)
 	defer req.Body.Close()
 	if err != nil {
 
-		log.Fatalln("获取请求：", err)
+		log.Println("获取请求：", err)
+		return false
 	}
 
 	pbresp, err := proto.GetResponse(resp, req)
 	if err != nil {
 
-		log.Fatalln("生成protoResponse错误：", err)
+		log.Println("生成protoResponse错误：", err)
+		return false
 	}
 	celVarMap["response"] = pbresp
 
 	pbreq, err := proto.GetRequest(req)
 	if err != nil {
 
-		log.Fatalln("生成protoRequest错误：", err)
+		log.Println("生成protoRequest错误：", err)
+		return false
 	}
 	celVarMap["request"] = pbreq
 
@@ -151,7 +155,7 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 
 			env, err := InitCelEnv(&c)
 			if err != nil {
-				log.Fatalln("初始化cel环境错误", err)
+				log.Println("初始化cel环境错误", err)
 				return false
 			}
 
@@ -169,7 +173,7 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 
 	env, err := InitCelEnv(&c)
 	if err != nil {
-		log.Fatalln("初始化cel环境错误", err)
+		log.Println("初始化cel环境错误", err)
 		return false
 	}
 
@@ -198,7 +202,7 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 func SetCelVar(c CustomLib, poc *pocstruct.Poc) map[string]interface{} {
 	env, err := InitCelEnv(&c)
 	if err != nil {
-		log.Fatalln("初始化cel环境错误", err)
+		log.Println("初始化cel环境错误", err)
 		return nil
 	}
 

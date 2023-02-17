@@ -20,7 +20,8 @@ func RuleKeys(filename string) map[string][]string {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatalln(filename, "打开错误")
+		log.Println(filename, "打开错误")
+		return nil
 	}
 	defer file.Close()
 
