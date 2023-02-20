@@ -30,7 +30,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	rep.Addr = addr
 	rep.Detail = poc.Detail
 
-	celVarMap := SetCelVar(c, poc) //获取set中的全局变量
+	celVarMap := SetCelVar(c, poc, rulekeysmap["set"]) //获取set中的全局变量
 
 	for _, key := range rulekeysmap["rules"] {
 
@@ -199,8 +199,10 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 }
 
 // 执行set，获取poc全局变量
-func SetCelVar(c CustomLib, poc *pocstruct.Poc) map[string]interface{} {
+func SetCelVar(c CustomLib, poc *pocstruct.Poc, setkeys []string) map[string]interface{} {
+
 	env, err := InitCelEnv(&c)
+
 	if err != nil {
 		log.Println("初始化cel环境错误", err)
 		return nil
@@ -208,7 +210,13 @@ func SetCelVar(c CustomLib, poc *pocstruct.Poc) map[string]interface{} {
 
 	celVarMap := make(map[string]interface{})
 
-	for k, v := range poc.Set {
+	for _, k := range setkeys {
+
+		v := poc.Set[k]
+		if v == "newReverse()" {
+			celVarMap[k] = utils.NewReverse()
+			continue
+		}
 
 		out, err := Evaluate(env, v, celVarMap)
 		if err != nil {

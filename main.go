@@ -32,6 +32,8 @@ func Init() {
 	flag.BoolVar(&global.IsShowPath, "showpath", false, "是否显示请求路径")
 	flag.BoolVar(&global.IsShowRequest, "showreq", false, "是否显示请求数据")
 	flag.BoolVar(&global.IsShowResponse, "showresp", false, "是否显示请求方法")
+	flag.StringVar(&global.CeyeApi, "ceyeapi", "", "ceyeapi")
+	flag.StringVar(&global.CeyeDomain, "ceyedomain", "", "ceyedomain")
 
 	flag.Parse()
 }

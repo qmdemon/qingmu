@@ -30,9 +30,10 @@ message Response {
 
 message Reverse {
   UrlType url = 1;
-  string domain = 2;
-  string ip = 3;
-  bool is_domain_name_server = 4;
+  string flag = 2;
+  string domain = 3;
+  string ip = 4;
+  bool is_domain_name_server = 5;
 }
 
 

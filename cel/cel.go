@@ -23,6 +23,7 @@ import (
 	"qingmu/cel/proto"
 	"qingmu/pocstruct"
 	"qingmu/report"
+	"qingmu/utils"
 	"regexp"
 	"strings"
 )
@@ -929,6 +930,23 @@ var submatchFunc = &functions.Overload{
 	},
 }
 
+//	反连平台结果
+var reverseWaitDec = decls.NewFunction("wait", decls.NewInstanceOverload("reverse_wait_int", []*exprpb.Type{decls.Any, decls.Int}, decls.Bool))
+var reverseWaitFunc = &functions.Overload{
+	Operator: "reverse_wait_int",
+	Binary: func(lhs ref.Val, rhs ref.Val) ref.Val {
+		reverse, ok := lhs.Value().(*proto.Reverse)
+		if !ok {
+			return types.ValOrErr(lhs, "unexpected type '%v' passed to 'wait'", lhs.Type())
+		}
+		timeout, ok := rhs.Value().(int64)
+		if !ok {
+			return types.ValOrErr(rhs, "unexpected type '%v' passed to 'wait'", rhs.Type())
+		}
+		return types.Bool(utils.ReverseCheck(reverse, timeout))
+	},
+}
+
 type CustomLib struct {
 	// 声明
 	envOptions []cel.EnvOption
@@ -963,6 +981,7 @@ func InitCelOptions() CustomLib {
 			base64DecodeDec, bbase64DecodeDec, urlencodeDec, burlencodeDec, urldecodeDec, burldecodeDec,
 			hexDec, bhexDec, hexDecodeDec, bhexDecodeDec, md5Dec, bmd5Dec, shaDec, bshaDec, hmacShaDec,
 			bhmacShaDec, randomIntDec, randomLowercaseDec, matchDec, bmatchDec, bsubmatchDech, submatchDech,
+			reverseWaitDec,
 		),
 	}
 
@@ -973,6 +992,7 @@ func InitCelOptions() CustomLib {
 		base64DecodeFunc, bbase64DecodeFunc, urlencodeFunc, burlencodeFunc, urldecodeFunc, burldecodeFunc,
 		hexFunc, bhexFunc, hexDecodeFunc, bhexDecodeFunc, md5Func, bmd5Func, shaFunc, bshaFunc, hmacShaFunc,
 		bhmacShaFunc, randomIntFunc, randomLowercaseFunc, matchFunc, bmatchFunc, bsubmatchFunc, submatchFunc,
+		reverseWaitFunc,
 	)}
 
 	return custom
