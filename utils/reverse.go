@@ -39,18 +39,18 @@ func ReverseCheck(r *proto.Reverse, timeout int64) bool {
 	//请求转化为小写
 	sub := strings.ToLower(r.Flag)
 	url := fmt.Sprintf("http://api.ceye.io/v1/records?token=%s&type=dns&filter=%s", global.CeyeApi, sub)
-	if getceyeresp(url) {
+	if getceye(url) {
 		return true
 	} else {
 		url = fmt.Sprintf("http://api.ceye.io/v1/records?token=%s&type=http&filter=%s", global.CeyeApi, r.Flag)
-		if getceyeresp(url) {
+		if getceye(url) {
 			return true
 		}
 	}
 	return false
 }
 
-func getceyeresp(url string) bool {
+func getceye(url string) bool {
 	status, resp, err := fasthttp.Get(nil, url)
 	if err != nil || status != fasthttp.StatusOK {
 		log.Println("ceye.io请求错误,状态码：", status, "错误 ", err)
