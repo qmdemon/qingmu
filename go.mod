@@ -17,5 +17,6 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
 	golang.org/x/text v0.3.8 // indirect
 )

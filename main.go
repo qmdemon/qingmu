@@ -34,6 +34,7 @@ func Init() {
 	flag.BoolVar(&global.IsShowResponse, "showresp", false, "是否显示请求方法")
 	flag.StringVar(&global.CeyeApi, "ceyeapi", "", "ceyeapi")
 	flag.StringVar(&global.CeyeDomain, "ceyedomain", "", "ceyedomain")
+	flag.StringVar(&global.Proxy, "proxy", "", "设置请求代理")
 
 	flag.Parse()
 }

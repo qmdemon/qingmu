@@ -10,3 +10,5 @@ var (
 	CeyeApi    string //ceye.io api
 	CeyeDomain string // domain
 )
+
+var Proxy string // fasthttp代理
