@@ -58,8 +58,9 @@ func RuleKeys(filename string) map[string][]string {
 		if setstart {
 			if strings.Index(str, "  ") == 0 && str[2] != 32 {
 				str = strings.TrimSpace(str)
+				s := strings.Split(str, ":")
 
-				setkeys = append(setkeys, str[:len(str)-1])
+				setkeys = append(setkeys, s[0])
 			}
 
 		}
@@ -94,6 +95,7 @@ func RuleKeys(filename string) map[string][]string {
 
 	rulemap["rules"] = rulekeys
 	rulemap["set"] = setkeys
+	//fmt.Println(rulemap)
 
 	return rulemap
 

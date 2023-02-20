@@ -3,6 +3,7 @@ package report
 import (
 	"fmt"
 	"github.com/gingfrederik/docx"
+	"os"
 	"strings"
 	"sync"
 )
@@ -47,6 +48,15 @@ func OutPutDocx(rep Report, wg *sync.WaitGroup) {
 		text.AddText(key.Expression + "\r\n").Color("0000ff")
 		text.AddText("结果：\r\n")
 		text.AddText("\t" + fmt.Sprintf("%v", "存在漏洞") + "\r\n").Color("0000ff")
+	}
+	//folderName := time.Now().Format("2006-01-02")
+	//folderPath := filepath.Join(basePath, folderName)
+	if _, err := os.Stat("output"); os.IsNotExist(err) {
+		// 必须分成两步
+		// 先创建文件夹
+		os.Mkdir("output", 0777)
+		// 再修改权限
+		os.Chmod("output", 0777)
 	}
 
 	f.Save("output/" + strings.ReplaceAll(strings.ReplaceAll(rep.Title, "http://", "http__"), "https://", "https__") + ".docx")

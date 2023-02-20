@@ -213,6 +213,7 @@ func SetCelVar(c CustomLib, poc *pocstruct.Poc, setkeys []string) map[string]int
 	for _, k := range setkeys {
 
 		v := poc.Set[k]
+		//fmt.Println(k, v)
 		if v == "newReverse()" {
 			celVarMap[k] = utils.NewReverse()
 			continue

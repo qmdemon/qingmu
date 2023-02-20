@@ -160,7 +160,7 @@ func runpoc(targets chan string, pocresult chan string, pocs chan string, wg *sy
 				wg.Add(1)
 				pocresult <- fmt.Sprintf("%s 存在 %s 漏洞", t, poc.Name)
 
-				go report.OutPutDocx(rep, wg)
+				go report.OutPutDocx(rep, wg) //docx报告输出
 
 				//do <- rep
 				//time.Sleep(time.Second * 3)
