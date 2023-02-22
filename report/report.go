@@ -22,8 +22,14 @@ type ReqResp struct {
 //
 //}
 
-func (r *Report) Set(req string, resp string, Expression string) {
+// 设置漏洞详情
+func (r *Report) SetVulInfo(req string, resp string, Expression string) {
 	r.Vul = append(r.Vul, ReqResp{
 		req, resp, Expression,
 	})
+}
+
+// 设置报告标题
+func (r *Report) SetTitle(title string) {
+	r.Title = title
 }

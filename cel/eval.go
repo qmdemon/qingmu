@@ -26,7 +26,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 
 	}
 	//
-	rep.Title = addr + "存在" + poc.Name + "漏洞" //报告title
+	rep.Title = addr + "存在" + poc.Name + "漏洞" //报告默认title
 	rep.Addr = addr
 	rep.Detail = poc.Detail
 
@@ -71,6 +71,10 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	//fmt.Println()
 
 	//pocresult <- outvalue
+	//rep.SetTitle(celVarMap["title"])
+	if celVarMap["title"] != nil {
+		rep.SetTitle(fmt.Sprintf("%v存在%s漏洞", celVarMap["title"], poc.Name))
+	}
 	return outvalue, rep
 
 }
@@ -108,7 +112,7 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 	//	Resp: resp.String(),
 	//}
 	//rep.Vul[key] = reqresp
-	//rep.Set(key, "", resp.String())
+	//rep.SetVulInfo(key, "", resp.String())
 
 	if err != nil {
 
@@ -279,8 +283,8 @@ func UrlTypeToString(u *proto.UrlType) string {
 //func NewCelEnv(pocRuleMap map[string]bool, pocstruct *pocstruct.Poc) (*cel.Env, error) {
 //	c := InitCelOptions(pocRuleMap)
 //
-//	if pocstruct.Set != nil {
-//		c.UpdateSetCompileOptions(pocstruct.Set)
+//	if pocstruct.SetVulInfo != nil {
+//		c.UpdateSetCompileOptions(pocstruct.SetVulInfo)
 //
 //	}
 //

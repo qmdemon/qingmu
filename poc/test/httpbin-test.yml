@@ -28,11 +28,11 @@ rules:
         tst: '{{var1}}'
     expression: response.status == 404
     output:
-      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
-      access_code: response.headers["Content-Type"]
+#      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
+      title: response.headers["Content-Type"]
 #      title: |
 #        search["title"]
-      adfbv: access_code
+#      adfbv: access_code
 expression: get() && post()
 detail:
   author: Hzllaga

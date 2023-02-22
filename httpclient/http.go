@@ -68,7 +68,7 @@ func HttpRequest(addr string, pocRequest *pocstruct.Request, Expression string, 
 		return resp, err
 	}
 	//fmt.Println(resp.StatusCode())
-	rep.Set(req.String(), resp.String(), Expression)
+	rep.SetVulInfo(req.String(), resp.String(), Expression)
 	if global.IsShowPath {
 		fmt.Println(pocRequest.Method, url)
 	}

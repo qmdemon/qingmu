@@ -59,7 +59,12 @@ func OutPutDocx(rep Report, wg *sync.WaitGroup) {
 		os.Chmod("output", 0777)
 	}
 
-	f.Save("output/" + strings.ReplaceAll(strings.ReplaceAll(rep.Title, "http://", "http__"), "https://", "https__") + ".docx")
+	title := strings.ReplaceAll(strings.ReplaceAll(rep.Title, "http://", "http__"), "https://", "https__")
+
+	title = strings.ReplaceAll(title, "/", "_")
+	title = strings.ReplaceAll(title, ":", "_")
+
+	f.Save("output/" + title + ".docx")
 
 	wg.Done()
 

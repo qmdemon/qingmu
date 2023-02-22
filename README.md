@@ -4,7 +4,7 @@
 
 本项目是为了学习go语言而编写，目标是希望实现xray 主动扫描功能以及被动扫描功能
 
-已完成第一阶段目标，使用xray poc进行漏洞漏洞扫描，并到处docx报告
+已完成第一阶段目标，使用xray poc进行漏洞扫描，并导出docx报告
 
 使用ceye.io 作为反连测试平台
 
@@ -60,5 +60,7 @@ https://codelabs.developers.google.com/codelabs/cel-go/#0
 
 ## 参考项目：
 https://github.com/jweny/pocassist
+
 https://github.com/jjf012/gopoc
+
 https://github.com/yuuuuu422/Gopo
