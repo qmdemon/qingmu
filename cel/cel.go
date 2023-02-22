@@ -965,13 +965,13 @@ func InitCelOptions() CustomLib {
 			&proto.Request{},
 			&proto.Response{},
 			&proto.Reverse{},
-			//&proto.Search{},
+			//&proto.Se
 		),
 		// 定义变量变量
 		cel.Declarations(
 			decls.NewVar("request", decls.NewObjectType("proto.Request")),
 			decls.NewVar("response", decls.NewObjectType("proto.Response")),
-			//decls.NewVar("search", decls.NewObjectType("proto.Search")),
+			decls.NewVar("reverse", decls.NewObjectType("proto.Reverse")),
 			//decls.NewVar("ts", decls.NewObjectType("proto.A123")),
 		),
 		// 定义
