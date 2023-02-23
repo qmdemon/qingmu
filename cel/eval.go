@@ -144,6 +144,29 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 	}
 	celVarMap["request"] = pbreq
 
+	env, err := InitCelEnv(&c)
+	if err != nil {
+		log.Println("初始化cel环境错误", err)
+		return false
+	}
+
+	out, err := Evaluate(env, rule.Expression, celVarMap)
+	if err != nil {
+		log.Println("执行rule.Expression错误：", err)
+		return false
+	}
+
+	outvalue, isbool := out.Value().(bool)
+
+	if !isbool {
+		log.Println("执行rule.Expression结果不为bool值：", out.Value())
+		return false
+	}
+	//判断rule.Expression 结果是否false ，若为false  就不执行output
+	if !outvalue {
+		return outvalue
+	}
+
 	if rule.OutPut != nil {
 		//search := make(map[string]interface{})
 
@@ -173,25 +196,6 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 			celVarMap[k] = out.Value()
 
 		}
-	}
-
-	env, err := InitCelEnv(&c)
-	if err != nil {
-		log.Println("初始化cel环境错误", err)
-		return false
-	}
-
-	out, err := Evaluate(env, rule.Expression, celVarMap)
-	if err != nil {
-		log.Println("执行rule.Expression错误：", err)
-		return false
-	}
-
-	outvalue, isbool := out.Value().(bool)
-
-	if !isbool {
-		log.Println("执行rule.Expression结果不为bool值：", out.Value())
-		return false
 	}
 
 	//if !outvalue {
