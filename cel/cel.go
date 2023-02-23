@@ -930,6 +930,23 @@ var submatchFunc = &functions.Overload{
 	},
 }
 
+// 空map
+var emptymapDech = decls.NewFunction("emptymap", decls.NewOverload("emptymap", []*exprpb.Type{}, decls.NewMapType(decls.String, decls.String)))
+var emptymapFunc = &functions.Overload{
+	Operator: "emptymap",
+	Function: func(val ...ref.Val) ref.Val {
+
+		var v3 ref.TypeAdapter
+
+		return types.NewStringStringMap(v3, func() map[string]string {
+
+			m := make(map[string]string)
+			return m
+		}())
+
+	},
+}
+
 //	反连平台结果
 var reverseWaitDec = decls.NewFunction("wait", decls.NewInstanceOverload("reverse_wait_int", []*exprpb.Type{decls.Any, decls.Int}, decls.Bool))
 var reverseWaitFunc = &functions.Overload{
@@ -981,7 +998,7 @@ func InitCelOptions() CustomLib {
 			base64DecodeDec, bbase64DecodeDec, urlencodeDec, burlencodeDec, urldecodeDec, burldecodeDec,
 			hexDec, bhexDec, hexDecodeDec, bhexDecodeDec, md5Dec, bmd5Dec, shaDec, bshaDec, hmacShaDec,
 			bhmacShaDec, randomIntDec, randomLowercaseDec, matchDec, bmatchDec, bsubmatchDech, submatchDech,
-			reverseWaitDec,
+			reverseWaitDec, emptymapDech,
 		),
 	}
 
@@ -992,7 +1009,7 @@ func InitCelOptions() CustomLib {
 		base64DecodeFunc, bbase64DecodeFunc, urlencodeFunc, burlencodeFunc, urldecodeFunc, burldecodeFunc,
 		hexFunc, bhexFunc, hexDecodeFunc, bhexDecodeFunc, md5Func, bmd5Func, shaFunc, bshaFunc, hmacShaFunc,
 		bhmacShaFunc, randomIntFunc, randomLowercaseFunc, matchFunc, bmatchFunc, bsubmatchFunc, submatchFunc,
-		reverseWaitFunc,
+		reverseWaitFunc, emptymapFunc,
 	)}
 
 	return custom
