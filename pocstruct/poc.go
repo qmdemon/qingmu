@@ -7,17 +7,17 @@ import (
 
 // xray pocstruct
 type Poc struct {
-	Name       string            `yaml:"name"`
-	Set        map[string]string `yaml:"set"`
-	Rules      map[string]Rule   `yaml:"rules"`
-	Detail     Detail            `yaml:"detail"`
-	Expression string            `yaml:"expression"`
+	Name       string          `yaml:"name"`
+	Set        yaml.MapSlice   `yaml:"set"`
+	Rules      map[string]Rule `yaml:"rules"`
+	Detail     Detail          `yaml:"detail"`
+	Expression string          `yaml:"expression"`
 }
 
 type Rule struct {
-	Request    Request                `yaml:"request"`
-	Expression string                 `yaml:"expression"`
-	OutPut     map[string]interface{} `yaml:"output"`
+	Request    Request       `yaml:"request"`
+	Expression string        `yaml:"expression"`
+	OutPut     yaml.MapSlice `yaml:"output"`
 }
 
 type Request struct {

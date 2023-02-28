@@ -16,6 +16,7 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/interpreter/functions"
 	exprpb "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
+	"gopkg.in/yaml.v2"
 	"hash"
 	"io"
 	"math/rand"
@@ -1029,14 +1030,14 @@ func (c *CustomLib) ProgramOptions() []cel.ProgramOption {
 }
 
 // set 类型注入
-func (c *CustomLib) UpdateSetCompileOptions(set map[string]string, setkeys []string) {
-	for _, k := range setkeys {
+func (c *CustomLib) UpdateSetCompileOptions(set yaml.MapSlice) {
+	for _, item := range set {
 
-		v := set[k]
-		// 在执行之前是不知道变量的类型的，所以统一声明为字符型
-		// 所以randomInt虽然返回的是int型，在运算中却被当作字符型进行计算，需要重载string_*_string
+		k := item.Key.(string)
+		v := item.Value.(string)
+
 		var d *exprpb.Decl
-		if strings.HasPrefix(v, "randomInt") {
+		if strings.HasPrefix((v), "randomInt") {
 			d = decls.NewIdent(k, decls.Int, nil)
 		} else if strings.HasPrefix(v, "newReverse") {
 			d = decls.NewIdent(k, decls.NewObjectType("proto.Reverse"), nil)
@@ -1069,7 +1070,7 @@ func (c *CustomLib) UpdateOutputCompileOptions(args map[string]interface{}) {
 //UpdateFunctionOptions 用来预先处理rule的键名，加载到env中
 //后续处理类似 r0()&&r1()这类的expression，可以索引到env中执行
 //动态函数注入
-func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstruct.Rule, celVarMap map[string]interface{}, outputkeys []string, rep *report.Report) {
+func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstruct.Rule, celVarMap map[string]interface{}, rep *report.Report) {
 	//expression:=v.Expression
 	//declarations
 	dec := decls.NewFunction(name, decls.NewOverload(name, []*exprpb.Type{}, decls.Bool))
@@ -1079,7 +1080,7 @@ func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstr
 		Function: func(values ...ref.Val) ref.Val {
 			//匿名函数，通过cel rule键进行注入，可以减少不必要的请求。
 			isTrue := func() bool {
-				return EvalRule(addr, rule, *c, celVarMap, outputkeys, rep)
+				return EvalRule(addr, rule, *c, celVarMap, rep)
 			}()
 			//执行 EvalRule
 

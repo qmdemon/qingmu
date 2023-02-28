@@ -17,12 +17,12 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 
 	rep := report.Report{}
 
-	rulekeysmap := utils.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
+	//rulekeysmap := utils.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
 
 	//pocRuleMap := make(map[string]bool) //用于xray动态函数注入，如：r0() && r1() 进行cel计算
 	c := InitCelOptions()
 	if poc.Set != nil {
-		c.UpdateSetCompileOptions(poc.Set, rulekeysmap["set"]) //set基础类型注入
+		c.UpdateSetCompileOptions(poc.Set) //set基础类型注入
 
 	}
 	//
@@ -30,17 +30,18 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 	rep.Addr = addr
 	rep.Detail = poc.Detail
 
-	celVarMap := SetCelVar(c, poc, rulekeysmap["set"]) //获取set中的全局变量
+	celVarMap := SetCelVar(c, poc) //获取set中的全局变量
 
-	for _, key := range rulekeysmap["rules"] {
+	for key, rule := range poc.Rules {
 
-		rule := poc.Rules[key]
-		outputkeys := rulekeysmap[key] //获取保存output 中的顺序
+		//key :=
+		//
+		//rule := poc.Rules[key]
 
 		//动态函数注入
 		// 传递变量，动态向cel注入函数
 		// 可以避免你无效请求
-		c.UpdateFunctionOptions(key, addr, &rule, celVarMap, outputkeys, &rep)
+		c.UpdateFunctionOptions(key, addr, &rule, celVarMap, &rep)
 
 	}
 
@@ -80,7 +81,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 }
 
 // 执行单个rule
-func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, outputkeys []string, rep *report.Report) bool {
+func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, rep *report.Report) bool {
 
 	//var mux sync.RWMutex
 
@@ -172,9 +173,10 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 
 		outmap := make(map[string]interface{})
 
-		for _, k := range outputkeys {
+		for _, item := range rule.OutPut {
 
-			v := rule.OutPut[k]
+			k := item.Key.(string)
+			v := item.Value.(string)
 
 			if outmap != nil {
 				c.UpdateOutputCompileOptions(outmap) // output 类型注入
@@ -186,7 +188,7 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 				return false
 			}
 
-			out, err := Evaluate(env, fmt.Sprintf("%v", v), celVarMap)
+			out, err := Evaluate(env, v, celVarMap)
 			if err != nil {
 				log.Println("执行rule.output错误：", v, err)
 				return false
@@ -207,7 +209,7 @@ func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[stri
 }
 
 // 执行set，获取poc全局变量
-func SetCelVar(c CustomLib, poc *pocstruct.Poc, setkeys []string) map[string]interface{} {
+func SetCelVar(c CustomLib, poc *pocstruct.Poc) map[string]interface{} {
 
 	env, err := InitCelEnv(&c)
 
@@ -218,9 +220,10 @@ func SetCelVar(c CustomLib, poc *pocstruct.Poc, setkeys []string) map[string]int
 
 	celVarMap := make(map[string]interface{})
 
-	for _, k := range setkeys {
+	for _, item := range poc.Set {
 
-		v := poc.Set[k]
+		k := item.Key.(string)
+		v := item.Value.(string)
 		//fmt.Println(k, v)
 		if v == "newReverse()" {
 			celVarMap[k] = utils.NewReverse()
