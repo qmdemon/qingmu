@@ -190,8 +190,13 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 
 			out, err := Evaluate(env, v, celVarMap)
 			if err != nil {
-				log.Println("执行rule.output错误：", v, err)
-				return false
+				if k == "title" { //判断是否是获取title 错误，若是title错误，设置celVarMap["title"] = nil 即跳过
+					continue
+				} else {
+					log.Println("执行rule.output错误：", v, err)
+					return false
+				}
+
 			}
 
 			outmap[k] = out.Value()
