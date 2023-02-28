@@ -1070,7 +1070,7 @@ func (c *CustomLib) UpdateOutputCompileOptions(args map[string]interface{}) {
 //UpdateFunctionOptions 用来预先处理rule的键名，加载到env中
 //后续处理类似 r0()&&r1()这类的expression，可以索引到env中执行
 //动态函数注入
-func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule *pocstruct.Rule, celVarMap map[string]interface{}, rep *report.Report) {
+func (c *CustomLib) UpdateFunctionOptions(name string, addr string, rule pocstruct.Rule, celVarMap map[string]interface{}, rep *report.Report) {
 	//expression:=v.Expression
 	//declarations
 	dec := decls.NewFunction(name, decls.NewOverload(name, []*exprpb.Type{}, decls.Bool))

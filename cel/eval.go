@@ -34,14 +34,14 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 
 	for key, rule := range poc.Rules {
 
-		//key :=
-		//
 		//rule := poc.Rules[key]
+
+		//fmt.Println(key, rule)
 
 		//动态函数注入
 		// 传递变量，动态向cel注入函数
-		// 可以避免你无效请求
-		c.UpdateFunctionOptions(key, addr, &rule, celVarMap, &rep)
+		// 可以避免无效请求
+		c.UpdateFunctionOptions(key, addr, rule, celVarMap, &rep)
 
 	}
 
@@ -81,7 +81,7 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 }
 
 // 执行单个rule
-func EvalRule(addr string, rule *pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, rep *report.Report) bool {
+func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[string]interface{}, rep *report.Report) bool {
 
 	//var mux sync.RWMutex
 
