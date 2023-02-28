@@ -73,8 +73,8 @@ func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Rep
 
 	//pocresult <- outvalue
 	//rep.SetTitle(celVarMap["title"])
-	if celVarMap["title"] != nil {
-		rep.SetTitle(fmt.Sprintf("%v存在%s漏洞", celVarMap["title"], poc.Name))
+	if celVarMap["reptitle"] != nil {
+		rep.SetTitle(fmt.Sprintf("%v存在%s漏洞", celVarMap["reptitle"], poc.Name))
 	}
 	return outvalue, rep
 
@@ -190,7 +190,7 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 
 			out, err := Evaluate(env, v, celVarMap)
 			if err != nil {
-				if k == "title" { //判断是否是获取title 错误，若是title错误，设置celVarMap["title"] = nil 即跳过
+				if k == "reptitle" { //判断是否是获取reptitle 错误，若是reptitle错误，设置celVarMap["reptitle"] = nil 即跳过
 					continue
 				} else {
 					log.Println("执行rule.output错误：", v, err)
