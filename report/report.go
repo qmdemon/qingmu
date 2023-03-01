@@ -8,7 +8,12 @@ type Report struct {
 	Title  string // 漏洞标题
 	Addr   string // 漏洞地址
 	Detail pocstruct.Detail
-	Vul    []ReqResp
+	Vulmap []VulMap
+}
+
+type VulMap struct {
+	Payload string
+	Vul     []ReqResp
 }
 
 type ReqResp struct {
@@ -24,7 +29,8 @@ type ReqResp struct {
 
 // 设置漏洞详情
 func (r *Report) SetVulInfo(req string, resp string, Expression string) {
-	r.Vul = append(r.Vul, ReqResp{
+
+	r.Vulmap[0].Vul = append(r.Vulmap[0].Vul, ReqResp{
 		req, resp, Expression,
 	})
 }

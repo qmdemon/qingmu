@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-func HttpRequest(addr string, pocRequest *pocstruct.Request, Expression string, rep *report.Report) (*fasthttp.Response, error) {
+func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, rep *report.Report) (*fasthttp.Response, error) {
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path

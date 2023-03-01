@@ -1,0 +1,24 @@
+name: tomcat
+manual: true
+transport: http
+set:
+  test: md5('123456')
+payloads:
+  payloads:
+    auth: base64('admin:admin')
+    auth: base64('admin:admin')
+    auth: base64('admin:admin123123')
+rules:
+  r1:
+    request:
+      method: GET
+      path: /manager/html
+      headers:
+        user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        Authorization: Basic {{auth}}
+    expression: response.status == 200
+    output:
+      reptitle: string("tomcat")
+expression: r1()
+detail:
+  author: qingmu

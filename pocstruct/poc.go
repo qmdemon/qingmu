@@ -9,9 +9,15 @@ import (
 type Poc struct {
 	Name       string          `yaml:"name"`
 	Set        yaml.MapSlice   `yaml:"set"`
+	Payloads   Payloads        `yaml:"payloads"`
 	Rules      map[string]Rule `yaml:"rules"`
 	Detail     Detail          `yaml:"detail"`
 	Expression string          `yaml:"expression"`
+}
+
+type Payloads struct {
+	Continue bool          `yaml:"continue,omitempty"`
+	Payloads yaml.MapSlice `yaml:"payloads"`
 }
 
 type Rule struct {

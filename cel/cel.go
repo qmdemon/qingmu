@@ -31,6 +31,21 @@ import (
 
 // func (s1 string) contains(s2 string) bool
 // 判断 s1 是否包含 s2，返回 bool 类型结果
+var stringDec = decls.NewFunction("string", decls.NewInstanceOverload("string", []*exprpb.Type{decls.String}, decls.String))
+var stringFunc = &functions.Overload{
+	Operator: "string",
+	Unary: func(lhs ref.Val) ref.Val {
+		v1, ok := lhs.(types.String)
+		if !ok {
+			return types.ValOrErr(lhs, "unexpected type '%v' passed to string", lhs.Type())
+		}
+
+		return v1
+	},
+}
+
+// func (s1 string) contains(s2 string) bool
+// 判断 s1 是否包含 s2，返回 bool 类型结果
 var containsDec = decls.NewFunction("contains", decls.NewInstanceOverload("contains_string", []*exprpb.Type{decls.String, decls.String}, decls.Bool))
 var containsFunc = &functions.Overload{
 	Operator: "contains_string",

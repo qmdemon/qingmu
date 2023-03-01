@@ -12,10 +12,59 @@ import (
 	"strings"
 )
 
-//执行yaml
-func EvalPoc(addr string, poc *pocstruct.Poc, filename string) (bool, report.Report) {
+// 执行yaml
+func Eval(addr string, poc *pocstruct.Poc) (bool, report.Report) {
+	if len(poc.Payloads.Payloads) == 0 {
+		//fmt.Println(poc.Set)
+		return EvalPoc(addr, poc)
+		//return false, report.Report{}
+	} else {
 
-	rep := report.Report{}
+		//return false, report.Report{}
+
+		set := poc.Set
+		reps := report.Report{}
+		for _, item := range poc.Payloads.Payloads {
+			poc.Set = append(set, item)
+
+			//fmt.Println(poc.Set)
+
+			isvul, rep := EvalPoc(addr, poc)
+
+			//fmt.Println(isvul)
+
+			if isvul {
+				if !poc.Payloads.Continue {
+					return isvul, rep
+				}
+
+				reps.Addr = rep.Addr
+				reps.Title = rep.Title
+				reps.Detail = rep.Detail
+
+				reps.Vulmap = append(reps.Vulmap, report.VulMap{
+					Payload: item.Value.(string),
+					Vul:     rep.Vulmap[0].Vul,
+				})
+
+			}
+		}
+
+		//fmt.Println(reps)
+
+		if len(reps.Vulmap) != 0 {
+			return true, reps
+		}
+
+		return false, reps
+
+	}
+}
+
+//执行poc
+func EvalPoc(addr string, poc *pocstruct.Poc) (bool, report.Report) {
+
+	rep := report.Report{Vulmap: []report.VulMap{report.VulMap{}}}
 
 	//rulekeysmap := utils.RuleKeys(filename) // 读取poc 用于解决map 遍历无序问题
 
@@ -85,28 +134,44 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 
 	//var mux sync.RWMutex
 
-	//fmt.Println(rule.Request.Path)
+	//fmt.Println(celVarMap)
 
 	//替换poc中的变量
+
+	headers := make(map[string]string)
+	var path string
+	var body string
+
 	for k1, v1 := range celVarMap {
 		_, isMap := v1.(map[string]string) //断言，判断是否为map
 		if isMap {
 			continue
 		}
 		value := fmt.Sprintf("%v", v1)
-		//mux.RLock()
 		for k2, v2 := range rule.Request.Headers {
 
-			rule.Request.Headers[k2] = strings.ReplaceAll(v2, "{{"+k1+"}}", value)
+			//fmt.Println(v2)
+			headers[k2] = strings.ReplaceAll(v2, "{{"+k1+"}}", value)
 
 		}
-		//mux.Unlock()
-		rule.Request.Path = strings.ReplaceAll(strings.TrimSpace(rule.Request.Path), "{{"+k1+"}}", value)
-		rule.Request.Body = strings.ReplaceAll(strings.TrimSpace(rule.Request.Body), "{{"+k1+"}}", value)
+
+		path = strings.ReplaceAll(strings.TrimSpace(rule.Request.Path), "{{"+k1+"}}", value)
+		body = strings.ReplaceAll(strings.TrimSpace(rule.Request.Body), "{{"+k1+"}}", value)
+		rule.Request.Path = path
+		rule.Request.Body = body
 	}
 
-	resp, err := httpclient.HttpRequest(addr, &rule.Request, rule.Expression, rep)
+	rule.Request.Headers = headers
+	rule.Request.Path = path
+	rule.Request.Body = body
+
+	resp, err := httpclient.HttpRequest(addr, rule.Request, rule.Expression, rep)
 	defer fasthttp.ReleaseResponse(resp) //在此释放resp资源
+
+	// 重新赋值poc中的变量，让下一个payload可以获取到{{}}
+	//fmt.Println(headers)
+
+	//fmt.Println(rule.Request.Headers, headers)
 
 	//reqresp := report.ReqResp{
 	//	Req:  oreq.String(),
@@ -247,6 +312,7 @@ func SetCelVar(c CustomLib, poc *pocstruct.Poc) map[string]interface{} {
 		case int64:
 			celVarMap[k] = int(value)
 		default:
+			//fmt.Println(out)
 			celVarMap[k] = fmt.Sprintf("%v", out)
 		}
 	}

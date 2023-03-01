@@ -155,7 +155,7 @@ func runpoc(targets chan string, pocresult chan string, pocs chan string, wg *sy
 				log.Println("解析yml错误：", err)
 				continue
 			}
-			success, rep := cel.EvalPoc(t, poc, p)
+			success, rep := cel.Eval(t, poc)
 
 			if success {
 				wg.Add(1)

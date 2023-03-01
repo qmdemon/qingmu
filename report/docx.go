@@ -33,22 +33,34 @@ func OutPutDocx(rep Report, wg *sync.WaitGroup) {
 	}
 
 	text.AddText("\r\n漏洞详情：\r\n").Size(15)
-	text.AddText(fmt.Sprintf("一共发送%d次请求:\r\n", len(rep.Vul)))
 
-	for i, key := range rep.Vul {
-		text.AddText(fmt.Sprintf("发送第%d次请求:\r\n", i+1)).Color("ff0000")
+	text.AddText(fmt.Sprintf("一共%d组payload:\r\n", len(rep.Vulmap)))
 
-		//text.AddText("请求URL：\r\n")
-		//text.AddText("\t" + v.Url + "\r\n").Color("0000ff")
-		text.AddText("请求数据包：\r\n")
-		text.AddText(key.Req + "\r\n").Color("0000ff")
-		text.AddText("请求响应包：\r\n")
-		text.AddText(key.Resp + "\r\n").Color("0000ff")
-		text.AddText("漏洞存在判断条件：\r\n")
-		text.AddText(key.Expression + "\r\n").Color("0000ff")
-		text.AddText("结果：\r\n")
-		text.AddText("\t" + fmt.Sprintf("%v", "存在漏洞") + "\r\n").Color("0000ff")
+	for i, p := range rep.Vulmap {
+
+		if p.Payload != "" {
+			text.AddText(fmt.Sprintf("第%d组paylaod:\r\n %v \r\n", i+1, p.Payload)).Color("ff0000")
+		}
+
+		text.AddText(fmt.Sprintf("第%d组payload共发送%d次请求:\r\n", i+1, len(p.Vul)))
+
+		for j, key := range p.Vul {
+			text.AddText(fmt.Sprintf("发送第%d次请求:\r\n", j+1)).Color("ff0000")
+
+			//text.AddText("请求URL：\r\n")
+			//text.AddText("\t" + v.Url + "\r\n").Color("0000ff")
+			text.AddText("请求数据包：\r\n")
+			text.AddText(key.Req + "\r\n").Color("0000ff")
+			text.AddText("请求响应包：\r\n")
+			text.AddText(key.Resp + "\r\n").Color("0000ff")
+			text.AddText("漏洞存在判断条件：\r\n")
+			text.AddText(key.Expression + "\r\n").Color("0000ff")
+			text.AddText("结果：\r\n")
+			text.AddText("\t" + fmt.Sprintf("%v", "存在漏洞") + "\r\n").Color("0000ff")
+		}
+
 	}
+
 	//folderName := time.Now().Format("2006-01-02")
 	//folderPath := filepath.Join(basePath, folderName)
 	if _, err := os.Stat("output"); os.IsNotExist(err) {
