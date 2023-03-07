@@ -138,9 +138,15 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 
 	//替换poc中的变量
 
-	headers := make(map[string]string)
-	var path string
-	var body string
+	//headers := make(map[string]string)
+	//var path string
+	//var body string
+
+	var rulereq pocstruct.Request = pocstruct.Request{
+		Method:          rule.Request.Method,
+		Headers:         make(map[string]string),
+		FollowRedirects: rule.Request.FollowRedirects,
+	}
 
 	for k1, v1 := range celVarMap {
 		_, isMap := v1.(map[string]string) //断言，判断是否为map
@@ -150,22 +156,27 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 		value := fmt.Sprintf("%v", v1)
 		for k2, v2 := range rule.Request.Headers {
 
-			//fmt.Println(v2)
-			headers[k2] = strings.ReplaceAll(v2, "{{"+k1+"}}", value)
+			if strings.Contains(v2, "{{"+k1+"}}") {
+				rulereq.Headers[k2] = strings.ReplaceAll(v2, "{{"+k1+"}}", value)
+				//fmt.Println(rulereq.Headers[k2], k1)
+			}
 
 		}
+		//fmt.Println(k1, rulereq.Headers)
+		if strings.Contains(rule.Request.Path, "{{"+k1+"}}") {
+			rulereq.Path = strings.ReplaceAll(strings.TrimSpace(rule.Request.Path), "{{"+k1+"}}", value)
+			rulereq.Body = strings.ReplaceAll(strings.TrimSpace(rule.Request.Body), "{{"+k1+"}}", value)
+		}
 
-		path = strings.ReplaceAll(strings.TrimSpace(rule.Request.Path), "{{"+k1+"}}", value)
-		body = strings.ReplaceAll(strings.TrimSpace(rule.Request.Body), "{{"+k1+"}}", value)
-		rule.Request.Path = path
-		rule.Request.Body = body
+		//rule.Request.Path = path
+		//rule.Request.Body = body
 	}
 
-	rule.Request.Headers = headers
-	rule.Request.Path = path
-	rule.Request.Body = body
+	//rule.Request.Headers = headers
+	//rule.Request.Path = path
+	//rule.Request.Body = body
 
-	resp, err := httpclient.HttpRequest(addr, rule.Request, rule.Expression, rep)
+	resp, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rep)
 	defer fasthttp.ReleaseResponse(resp) //在此释放resp资源
 
 	// 重新赋值poc中的变量，让下一个payload可以获取到{{}}

@@ -1,13 +1,6 @@
 name: tomcat
 manual: true
 transport: http
-set:
-  test: md5('123456')
-payloads:
-  payloads:
-    auth: base64('admin:admin')
-    auth: base64('admin:admin')
-    auth: base64('admin:admin123123')
 rules:
   r1:
     request:
