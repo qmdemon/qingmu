@@ -1,6 +1,7 @@
 package cel
 
 import (
+	"fmt"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
@@ -83,16 +84,24 @@ func (c *CustomLib) UpdateSetCompileOptions(set yaml.MapSlice) {
 	for _, item := range set {
 
 		k := item.Key.(string)
-		v := item.Value.(string)
+		v := item.Value.(interface{})
 
 		var d *exprpb.Decl
-		if strings.HasPrefix((v), "randomInt") {
-			d = decls.NewIdent(k, decls.Int, nil)
-		} else if strings.HasPrefix(v, "newReverse") {
-			d = decls.NewIdent(k, decls.NewObjectType("proto.Reverse"), nil)
+
+		_, ok := v.(map[string]string)
+
+		if ok {
+			d = decls.NewIdent(k, decls.NewMapType(decls.String, decls.String), nil)
 		} else {
-			d = decls.NewIdent(k, decls.String, nil)
+			if strings.HasPrefix(fmt.Sprintf("%v", v), "randomInt") {
+				d = decls.NewIdent(k, decls.Int, nil)
+			} else if strings.HasPrefix(fmt.Sprintf("%v", v), "newReverse") {
+				d = decls.NewIdent(k, decls.NewObjectType("proto.Reverse"), nil)
+			} else {
+				d = decls.NewIdent(k, decls.String, nil)
+			}
 		}
+
 		c.envOptions = append(c.envOptions, cel.Declarations(d))
 	}
 }
