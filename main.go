@@ -14,12 +14,13 @@ import (
 )
 
 var (
-	target   string
-	linkfile string
-	pocfile  string
-	poctype  string
-	tnum     int
-	pnum     int
+	target    string
+	linkfile  string
+	pocfile   string
+	poctype   string
+	tnum      int
+	pnum      int
+	outreport bool
 )
 
 func Init() {
@@ -35,6 +36,8 @@ func Init() {
 	flag.StringVar(&global.CeyeApi, "ceyeapi", "", "ceyeapi")
 	flag.StringVar(&global.CeyeDomain, "ceyedomain", "", "ceyedomain")
 	flag.StringVar(&global.Proxy, "proxy", "", "设置请求代理")
+
+	flag.BoolVar(&outreport, "outreport", true, "是否输出报告")
 
 	flag.Parse()
 }
@@ -161,7 +164,11 @@ func runpoc(targets chan string, pocresult chan string, pocs chan string, wg *sy
 				wg.Add(1)
 				pocresult <- fmt.Sprintf("%s 存在 %s 漏洞", t, poc.Name)
 
-				go report.OutPutDocx(rep, wg) //docx报告输出
+				if outreport {
+					go report.OutPutDocx(rep, wg) //docx报告输出
+				} else {
+					wg.Done()
+				}
 
 				//do <- rep
 				//time.Sleep(time.Second * 3)
