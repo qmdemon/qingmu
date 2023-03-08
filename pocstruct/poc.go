@@ -27,7 +27,6 @@ type Rule struct {
 }
 
 type Request struct {
-	Cache           bool              `yaml:"cache"`
 	Method          string            `yaml:"method"`
 	Path            string            `yaml:"path"`
 	Headers         map[string]string `yaml:"headers"`

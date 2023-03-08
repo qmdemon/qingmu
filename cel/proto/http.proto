@@ -13,19 +13,27 @@ message UrlType {
 }
 
 message Request {
-  UrlType url = 1;
-  string method = 2;
-  map<string, string> headers = 3;
-  string content_type = 4;
-  bytes body = 5;
+  bytes raw = 1;
+  UrlType url = 2;
+  string method = 3;
+  map<string, string> headers = 4;
+  string content_type = 5;
+  bytes raw_header = 6;
+  bytes body = 7;
 }
 
 message Response {
-  UrlType url = 1;
-  int32 status = 2 ;
-  map<string,  string> headers = 3;
-  string content_type = 4;
+  string raw = 1;
+  UrlType url = 2;
+  int32 status = 3 ;
+  bytes raw_header = 4;
   bytes body = 5;
+  string body_string = 6;
+  map<string,  string> headers = 7;
+  string content_type = 8;
+  int32 latency = 9;
+  bytes title = 10;
+  string title_string = 11;
 }
 
 message Reverse {
