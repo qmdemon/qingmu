@@ -63,9 +63,19 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 		}
 	}
 
-	if err := client.Do(req, resp); err != nil {
+	// 判断是否跟随重定向
+	if pocRequest.FollowRedirects {
+
+		//fmt.Println("默认设置?")// 默认设置为false
+		err := client.DoRedirects(req, resp, 5) // 设置最大重定向为5
 		log.Println("请求失败:", err.Error())
 		return resp, err
+
+	} else {
+		if err := client.Do(req, resp); err != nil {
+			log.Println("请求失败:", err.Error())
+			return resp, err
+		}
 	}
 	//fmt.Println(resp.StatusCode())
 	rep.SetVulInfo(req.String(), resp.String(), Expression)
