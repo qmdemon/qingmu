@@ -4,11 +4,11 @@ set:
   var1: base64('abc')
   var2: md5('123456')
 
-payloads:
-  continue: true
-  payloads:
-    var: base64('abc')
-    var: md5('123456')
+#payloads:
+#  continue: true
+#  payloads:
+#    var: base64('abc')
+#    var: md5('123456')
 
 rules:
   pos123213t:
@@ -25,16 +25,15 @@ rules:
     request:
       cache: true
       method: GET
-      path: /ge123t?key={{var2}}
+      path: /get?key={{var2}}
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
         tst: '{{var}}'
-    expression: response.status == 404
+    expression: response.status == 200
     output:
-      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
+#      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
 #      title: response.headers["Content-Type"]
-      reptitle: |
-        search["title"]
+      reptitle: response.title_string
 #      adfbv: access_code
 expression: get()
 detail:

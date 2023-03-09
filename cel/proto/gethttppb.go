@@ -26,9 +26,15 @@ func GetResponse(resp httpclient.Response, req *fasthttp.Request) (*Response, er
 
 	// title 正则表达式
 	r, _ := regexp.Compile(`<title>(.*?)</title>`)
-	pbresp.TitleString = r.FindStringSubmatch(pbresp.BodyString)[1]
+	t := r.FindStringSubmatch(pbresp.BodyString)
 
-	pbresp.Title = r.FindSubmatch(pbresp.Body)[1]
+	if len(t) == 0 {
+		pbresp.TitleString = ""
+		pbresp.Title = nil
+	} else {
+		pbresp.TitleString = t[1]
+		pbresp.Title = []byte(t[1])
+	}
 
 	pbresp.Url = GetUrlType(req.URI())
 
