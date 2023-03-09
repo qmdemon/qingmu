@@ -22,7 +22,7 @@ func NewReverse() *proto.Reverse {
 	u, _ := url.Parse(urlStr)
 	return &proto.Reverse{
 		Flag:               flag,
-		Url:                proto.GetUrlType(u),
+		Url:                &proto.UrlType{Scheme: u.Scheme, Domain: u.Hostname(), Host: u.Host, Port: u.Port(), Path: u.EscapedPath(), Query: u.RawQuery, Fragment: u.Fragment},
 		Domain:             u.Hostname(),
 		Ip:                 "",
 		IsDomainNameServer: false,

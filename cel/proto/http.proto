@@ -23,7 +23,7 @@ message Request {
 }
 
 message Response {
-  string raw = 1;
+  bytes raw = 1;
   UrlType url = 2;
   int32 status = 3 ;
   bytes raw_header = 4;

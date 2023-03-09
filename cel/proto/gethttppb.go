@@ -1,23 +1,38 @@
 package proto
 
 import (
-	"bytes"
 	"github.com/valyala/fasthttp"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"net/url"
 	"qingmu/httpclient"
+	"regexp"
 	"strings"
 )
 
-func GetResponse(resp *fasthttp.Response, req *http.Request) (*Response, error) {
+func GetResponse(resp httpclient.Response, req *fasthttp.Request) (*Response, error) {
 	var pbresp Response
 
-	pbresp.Status = int32(resp.StatusCode())
-	pbresp.ContentType = string(resp.Header.ContentType())
-	pbresp.Body = resp.Body()
-	respheaders, err := httpclient.GetResponseHeaders(resp.String())
+	pbresp.Raw = []byte(resp.Resp.String())
+
+	pbresp.Status = int32(resp.Resp.StatusCode())
+
+	pbresp.RawHeader = resp.Resp.Header.Header()
+	pbresp.Body = resp.Resp.Body()
+	//pbresp.BodyString = resp.Resp.Body()
+	pbresp.ContentType = string(resp.Resp.Header.ContentType())
+
+	pbresp.BodyString = httpclient.GetResponseBodyString(pbresp.Body, pbresp.Headers["Content-Encoding"])
+
+	pbresp.Latency = resp.Latency
+
+	// title 正则表达式
+	r, _ := regexp.Compile(`<title>(.*?)</title>`)
+	pbresp.TitleString = r.FindStringSubmatch(pbresp.BodyString)[1]
+
+	pbresp.Title = r.FindSubmatch(pbresp.Body)[1]
+
+	pbresp.Url = GetUrlType(req.URI())
+
+	respheaders, err := httpclient.GetResponseHeaders(resp.Resp.String())
 	if err != nil {
 		log.Println("获取responseheaders错误", err)
 		return &pbresp, err
@@ -28,41 +43,69 @@ func GetResponse(resp *fasthttp.Response, req *http.Request) (*Response, error) 
 		pbresp.Headers[k] = strings.Join(v, "，")
 		//fmt.Println(k, v)
 	}
-	pbresp.Url = GetUrlType(req.URL)
 
 	return &pbresp, nil
 }
 
-func GetUrlType(u *url.URL) *UrlType {
+func GetUrlType(uri *fasthttp.URI) *UrlType {
 	nu := &UrlType{}
-	nu.Scheme = u.Scheme
-	nu.Domain = u.Hostname()
-	nu.Host = u.Host
-	nu.Port = u.Port()
-	nu.Path = u.EscapedPath()
-	nu.Query = u.RawQuery
-	nu.Fragment = u.Fragment
+	nu.Scheme = string(uri.Scheme())
+	//nu.Domain = string(uri.Host())
+	nu.Host = string(uri.Host())
+	//nu.Port = req.URI().Port()
+	nu.Path = string(uri.Path())
+	nu.Query = string(uri.QueryString())
+
+	host := strings.Split(nu.Host, ":")
+
+	if len(host) == 1 {
+		if nu.Scheme == "http" {
+			nu.Port = "80"
+		} else {
+			nu.Port = "443"
+		}
+		nu.Domain = nu.Host
+	} else {
+		nu.Port = host[1]
+		nu.Domain = host[0]
+	}
+
+	fragment := strings.Split(uri.String(), "#")
+
+	if len(fragment) == 1 {
+		nu.Fragment = ""
+	} else {
+		nu.Fragment = fragment[1]
+	}
 	return nu
 }
 
-func GetRequest(oReq *http.Request) (*Request, error) {
-	req := &Request{}
-	req.Method = oReq.Method
-	req.Url = GetUrlType(oReq.URL)
-	header := make(map[string]string)
-	for k := range oReq.Header {
-		header[k] = oReq.Header.Get(k)
+func GetRequest(req *fasthttp.Request) (*Request, error) {
+
+	var pbreq Request
+
+	pbreq.Raw = []byte(req.String())
+
+	pbreq.Url = GetUrlType(req.URI())
+	pbreq.Method = string(req.Header.Method())
+
+	pbreq.ContentType = string(req.Header.ContentType())
+
+	pbreq.RawHeader = req.Header.Header()
+
+	pbreq.Body = req.Body()
+
+	reqheaders, err := httpclient.GetRequestHeaders(req.String())
+	if err != nil {
+		log.Println("获取responseheaders错误", err)
+		return &pbreq, err
 	}
-	req.Headers = header
-	req.ContentType = oReq.Header.Get("Content-Type")
-	if oReq.Body == nil || oReq.Body == http.NoBody {
-	} else {
-		data, err := ioutil.ReadAll(oReq.Body)
-		if err != nil {
-			return nil, err
-		}
-		req.Body = data
-		oReq.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+	pbreq.Headers = make(map[string]string)
+
+	for k, v := range reqheaders {
+		pbreq.Headers[k] = strings.Join(v, "，")
+		//fmt.Println(k, v)
 	}
-	return req, nil
+
+	return &pbreq, nil
 }

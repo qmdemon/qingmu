@@ -3,10 +3,12 @@ package httpclient
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"crypto/tls"
 	"fmt"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpproxy"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -14,14 +16,21 @@ import (
 	"qingmu/pocstruct"
 	"qingmu/report"
 	"strings"
+	"time"
 )
 
-func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, rep *report.Report) (*fasthttp.Response, error) {
+type Response struct {
+	Resp    *fasthttp.Response
+	Latency int32
+}
+
+func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, rep *report.Report) (r Response, req *fasthttp.Request, err error) {
+
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path
 
-	req := fasthttp.AcquireRequest()
+	req = fasthttp.AcquireRequest()
 	//defer fasthttp.ReleaseRequest(req) // 用完需要释放资源
 
 	req.Header.SetMethod(pocRequest.Method)
@@ -67,14 +76,27 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 	if pocRequest.FollowRedirects {
 
 		//fmt.Println("默认设置?")// 默认设置为false
-		err := client.DoRedirects(req, resp, 5) // 设置最大重定向为5
+		// 请求开始时间
+		time_start := time.Now()
+		err = client.DoRedirects(req, resp, 5) // 设置最大重定向为5
+
+		r.Latency = int32(time.Since(time_start).Milliseconds()) // 计算请求结束时间
+
 		log.Println("请求失败:", err.Error())
-		return resp, err
+
+		r.Resp = resp
+
+		return r, req, err
 
 	} else {
-		if err := client.Do(req, resp); err != nil {
+		// 请求开始时间
+		time_start := time.Now()
+		err = client.Do(req, resp)
+		r.Latency = int32(time.Since(time_start).Milliseconds()) // 计算请求结束时间
+		if err != nil {
 			log.Println("请求失败:", err.Error())
-			return resp, err
+			r.Resp = resp
+			return r, req, err
 		}
 	}
 	//fmt.Println(resp.StatusCode())
@@ -88,8 +110,8 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 	if global.IsShowResponse {
 		fmt.Println(resp.String())
 	}
-
-	return resp, nil
+	r.Resp = resp
+	return r, req, nil
 
 }
 
@@ -103,25 +125,30 @@ func GetResponseHeaders(fasthttpresp string) (http.Header, error) {
 	return resp.Header, err
 }
 
-func NetHttpReq(addr string, pocRequest *pocstruct.Request) (*http.Request, error) {
-
-	addr = strings.TrimSpace(addr)
-
-	url := addr + pocRequest.Path
-	req, err := http.NewRequest(pocRequest.Method, url, strings.NewReader(pocRequest.Body))
+func GetRequestHeaders(fasthttpreq string) (http.Header, error) {
+	resp, err := http.ReadRequest(bufio.NewReader(bytes.NewReader([]byte(fasthttpreq))))
+	defer resp.Body.Close()
 	if err != nil {
-		log.Println("生成net/http/req错误", err)
 		return nil, err
 	}
 
-	if pocRequest.Headers != nil {
-		for k, v := range pocRequest.Headers {
-			req.Header.Set(k, v)
+	return resp.Header, err
+}
+
+func GetResponseBodyString(body []byte, ce string) string {
+	if ce == "gzip" {
+		reader, err := gzip.NewReader(bytes.NewReader(body))
+		if err != nil {
+			return string(body)
 		}
+
+		body, _ = ioutil.ReadAll(reader)
+
+		return string(body)
+
+	} else {
+		return string(body)
 	}
-
-	return req, nil
-
 }
 
 // http代理

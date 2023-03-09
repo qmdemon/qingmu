@@ -178,8 +178,8 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 	//rule.Request.Path = path
 	//rule.Request.Body = body
 
-	resp, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rep)
-	defer fasthttp.ReleaseResponse(resp) //在此释放resp资源
+	resp, req, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rep)
+	defer fasthttp.ReleaseResponse(resp.Resp) //在此释放resp资源
 
 	// 重新赋值poc中的变量，让下一个payload可以获取到{{}}
 	//fmt.Println(headers)
@@ -199,8 +199,8 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 		return false
 	}
 	//fmt.Println(resp.String())
-	req, err := httpclient.NetHttpReq(addr, &rule.Request)
-	defer req.Body.Close()
+	//req, err := httpclient.NetHttpReq(addr, &rule.Request)
+	//defer req.Body.Close()
 	if err != nil {
 
 		log.Println("获取请求：", err)
