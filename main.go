@@ -165,7 +165,7 @@ func runpoc(targets chan string, pocresult chan string, pocs chan string, wg *sy
 				pocresult <- fmt.Sprintf("%s 存在 %s 漏洞", t, poc.Name)
 
 				if outreport {
-					go report.OutPutDocx(rep, wg) //docx报告输出
+					go report.UniofficeOutPutDocx(rep, wg) //docx报告输出
 				} else {
 					wg.Done()
 				}
