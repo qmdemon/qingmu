@@ -159,15 +159,21 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 			if strings.Contains(v2, "{{"+k1+"}}") {
 				rulereq.Headers[k2] = strings.ReplaceAll(v2, "{{"+k1+"}}", value)
 				//fmt.Println(rulereq.Headers[k2], k1)
+			} else {
+				rulereq.Headers[k2] = v2
 			}
 
 		}
 		//fmt.Println(k1, rulereq.Headers)
 		if strings.Contains(rule.Request.Path, "{{"+k1+"}}") {
 			rulereq.Path = strings.ReplaceAll(strings.TrimSpace(rule.Request.Path), "{{"+k1+"}}", value)
+		} else {
+			rulereq.Path = strings.TrimSpace(rule.Request.Path)
 		}
 		if strings.Contains(rule.Request.Body, "{{"+k1+"}}") {
 			rulereq.Body = strings.ReplaceAll(rule.Request.Body, "{{"+k1+"}}", value)
+		} else {
+			rulereq.Body = rule.Request.Body
 		}
 
 		//rule.Request.Path = path

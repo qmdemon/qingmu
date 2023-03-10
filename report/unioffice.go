@@ -11,7 +11,10 @@ import (
 	"sync"
 )
 
+//unioffice 使用的是1.4.0 可以不用添加许可
+// 报告导出docx
 func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
+
 	// 定义一个名为 "test.v" 的 flag，并指定默认值为 false
 	flag.Bool("test.v", false, "加上这个可以隐藏unioffice 输出的信息")
 
