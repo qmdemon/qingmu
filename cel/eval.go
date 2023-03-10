@@ -148,6 +148,14 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 		FollowRedirects: rule.Request.FollowRedirects,
 	}
 
+	// 先赋值
+	for k2, v2 := range rule.Request.Headers {
+		rulereq.Headers[k2] = v2
+	}
+	rulereq.Path = strings.TrimSpace(rule.Request.Path)
+	rulereq.Body = rule.Request.Body
+
+	// 再读取全局变量并修改
 	for k1, v1 := range celVarMap {
 		_, isMap := v1.(map[string]string) //断言，判断是否为map
 		if isMap {
@@ -159,26 +167,30 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 			if strings.Contains(v2, "{{"+k1+"}}") {
 				rulereq.Headers[k2] = strings.ReplaceAll(v2, "{{"+k1+"}}", value)
 				//fmt.Println(rulereq.Headers[k2], k1)
-			} else {
-				rulereq.Headers[k2] = v2
 			}
 
 		}
 		//fmt.Println(k1, rulereq.Headers)
+		//fmt.Println(rule.Request.Path)
+		//fmt.Println(rulereq.Path, celVarMap["path"])
+
 		if strings.Contains(rule.Request.Path, "{{"+k1+"}}") {
 			rulereq.Path = strings.ReplaceAll(strings.TrimSpace(rule.Request.Path), "{{"+k1+"}}", value)
-		} else {
-			rulereq.Path = strings.TrimSpace(rule.Request.Path)
+			//fmt.Println(rulereq.Path)
 		}
+
 		if strings.Contains(rule.Request.Body, "{{"+k1+"}}") {
 			rulereq.Body = strings.ReplaceAll(rule.Request.Body, "{{"+k1+"}}", value)
-		} else {
-			rulereq.Body = rule.Request.Body
 		}
+
+		//
 
 		//rule.Request.Path = path
 		//rule.Request.Body = body
+
 	}
+
+	//fmt.Println("请求地址", rulereq.Path)
 
 	//rule.Request.Headers = headers
 	//rule.Request.Path = path
@@ -287,6 +299,7 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 			celVarMap[k] = out.Value()
 
 		}
+
 	}
 
 	//if !outvalue {

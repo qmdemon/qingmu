@@ -1,0 +1,31 @@
+name: 文件上传测试
+rules:
+  r1:
+    request:
+      method: POST
+      path: /net/controller.ashx?action=uploadimage
+      headers:
+        user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryorgXkX1mg3QTLDKr
+      body: |
+        ------WebKitFormBoundaryorgXkX1mg3QTLDKr
+        Content-Disposition: form-data; name="upfile"; filename="test.png"
+        Content-Type: image/png
+
+        �PNG
+        123
+        
+        ------WebKitFormBoundaryorgXkX1mg3QTLDKr--
+    expression: response.status == 200
+    output:
+      search: '"\"url\":\"(?P<path>.+?)\",\"title\":\"".bsubmatch(response.body)'
+      path: search["path"]
+  r2:
+    request:
+      method: GET
+      path: /net/{{path}}
+    expression: response.status == 200
+
+expression: r1() && r2()
+detail:
+  author: qingmu
