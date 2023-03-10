@@ -3,29 +3,45 @@ rules:
   r1:
     request:
       method: POST
-      path: /net/controller.ashx?action=uploadimage
+      path: /vulnerabilities/upload/
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
-        Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryorgXkX1mg3QTLDKr
+        Content-Type:  multipart/form-data; boundary=----WebKitFormBoundarynuE9llij1hTVvCxk
+        Cookie: PHPSESSID=unovse4qudsgfmtqvmkpggvppd; security=low
       body: |
-        ------WebKitFormBoundaryorgXkX1mg3QTLDKr
-        Content-Disposition: form-data; name="upfile"; filename="test.png"
+        ------WebKitFormBoundarynuE9llij1hTVvCxk
+        Content-Disposition: form-data; name="uploaded"; filename="t.PNG"
         Content-Type: image/png
 
         �PNG
-        123
-        
-        ------WebKitFormBoundaryorgXkX1mg3QTLDKr--
+        12312312312312312312312312312
+        ------WebKitFormBoundarynuE9llij1hTVvCxk
+        Content-Disposition: form-data; name="Upload"
+
+        Upload
+        ------WebKitFormBoundarynuE9llij1hTVvCxk--
     expression: response.status == 200
     output:
-      search: '"\"url\":\"(?P<path>.+?)\",\"title\":\"".bsubmatch(response.body)'
+      search: '"<pre>.*../../(?P<path>.+?) succesfully".bsubmatch(response.body)'
       path: search["path"]
   r2:
     request:
       method: GET
-      path: /net/{{path}}
+      path: /{{path}}
     expression: response.status == 200
-
+    output:
+      reptitle: |
+        '上传测试'
 expression: r1() && r2()
 detail:
-  author: qingmu
+  author: |
+    "'青木'"
+  links:
+    - https://github.com/th3gundy/CVE-2019-7192_QNAP_Exploit
+    - http://github.com/qmdemon/qingmu
+  description: |
+    1. 限制上传后缀名
+    2. 对每一次请求都设置一个token
+    3. 对上传的目录设置禁止执行权限
+
+

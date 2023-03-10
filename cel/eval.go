@@ -287,6 +287,7 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 			out, err := Evaluate(env, v, celVarMap)
 			if err != nil {
 				if k == "reptitle" { //判断是否是获取reptitle 错误，若是reptitle错误，设置celVarMap["reptitle"] = nil 即跳过
+					log.Println("执行rule.output错误：", v, err)
 					continue
 				} else {
 					log.Println("执行rule.output错误：", v, err)

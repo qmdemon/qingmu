@@ -5,13 +5,13 @@ set:
   var2: md5('123456')
 
 payloads:
-  continue: true
+#  continue: true
   payloads:
     var: base64('abc')
     var: md5('123456')
 
 rules:
-  pos123213t:
+  post:
     request:
       cache: true
       method: POST
@@ -25,18 +25,25 @@ rules:
     request:
       cache: true
       method: GET
-      path: /get123?key={{var2}}
+      path: /get?key={{var2}}
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
         tst: '{{var}}'
-    expression: response.status == 404
+    expression: response.status == 200
     output:
 #      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
 #      title: response.headers["Content-Type"]
-      reptitle: response.title_string
+      reptitle:
+        '"123123"'
 #      adfbv: access_code
-expression: get()
+expression: get() && post()
 detail:
-  author: Hzllaga
+  author: |
+    "'青木'"
   links:
     - https://github.com/th3gundy/CVE-2019-7192_QNAP_Exploit
+    - http://github.com/qmdemon/qingmu
+  description:
+    1. 限制上传后缀名
+    2. 对每一次请求都设置一个token
+    3. 对上传的目录设置禁止执行权限

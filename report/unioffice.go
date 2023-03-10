@@ -62,11 +62,10 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 		run.AddText("参考链接")
 
 		//设置正文
-		para = doc.AddParagraph()
-		para.Properties().SetFirstLineIndent(0.5 * measurement.Inch) //空格
-		run = para.AddRun()
 		for _, link := range rep.Detail.Links {
-			run.AddText(link)
+			para = doc.AddParagraph()
+			para.Properties().SetFirstLineIndent(0.5 * measurement.Inch) //空格
+			para.AddRun().AddText(link)
 		}
 		//run.AddText( strings.Join(rep.Detail.Links, "\r\n"))
 
@@ -78,11 +77,19 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 		run = para.AddRun()
 		run.AddText("漏洞描述")
 
+		des := strings.Split(rep.Detail.Description, "\n")
 		//设置正文
-		para = doc.AddParagraph()
-		para.Properties().SetFirstLineIndent(0.5 * measurement.Inch) //空格
-		run = para.AddRun()
-		run.AddText(rep.Detail.Description)
+		for _, d := range des {
+			para = doc.AddParagraph()
+			para.Properties().SetFirstLineIndent(0.5 * measurement.Inch) //空格
+			para.AddRun().AddText(d)
+		}
+
+		//des := strings.ReplaceAll(rep.Detail.Description, "\n", "\r\n")
+
+		//fmt.Println(rep.Detail.Description)
+
+		//run.AddText(des)
 		//text.AddText("\t" + rep.Detail.Description + "\r\n").Color("0000ff")
 	}
 
@@ -154,7 +161,12 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 			run.Properties().SetBold(true)
 			run.Properties().SetSize(9)
 			run.Properties().SetColor(color.Blue)
-			run.AddText(key.Req)
+
+			// 使能够在docx文档中打印的换行
+			req := strings.ReplaceAll(key.Req, "\n", "\r\n")
+			req = strings.ReplaceAll(req, "\r\r\n", "\r\n")
+
+			run.AddText(req)
 
 			doc.AddParagraph().AddRun().AddText("") //添加空行
 			//设置正文
@@ -173,7 +185,10 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 			run.Properties().SetBold(true)
 			run.Properties().SetSize(9)
 			run.Properties().SetColor(color.Blue)
-			run.AddText(key.Resp)
+
+			resp := strings.ReplaceAll(key.Resp, "\n", "\r\n")
+			resp = strings.ReplaceAll(resp, "\r\r\n", "\r\n")
+			run.AddText(resp)
 
 			doc.AddParagraph().AddRun().AddText("") //添加空行
 			//设置正文
