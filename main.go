@@ -24,6 +24,8 @@ var (
 )
 
 func Init() {
+	flag.Bool("test.v", false, "加上这个可以隐藏unioffice 输出的信息") // 这个就是用来隐藏unioffice 在终端中输出的信息
+
 	flag.StringVar(&target, "target", "", "扫描目标")
 	flag.StringVar(&linkfile, "linkfile", "", "目标地址文件")
 	flag.StringVar(&pocfile, "pocfile", "", "poc文件")

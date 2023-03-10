@@ -1,7 +1,6 @@
 package report
 
 import (
-	"flag"
 	"fmt"
 	"github.com/unidoc/unioffice/color"
 	"github.com/unidoc/unioffice/document"
@@ -16,7 +15,7 @@ import (
 func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 
 	// 定义一个名为 "test.v" 的 flag，并指定默认值为 false
-	flag.Bool("test.v", false, "加上这个可以隐藏unioffice 输出的信息")
+	//flag.Bool("test.v", false, "加上这个可以隐藏unioffice 输出的信息")
 
 	doc := document.New()
 

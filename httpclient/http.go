@@ -94,7 +94,7 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 		err = client.Do(req, resp)
 		r.Latency = int32(time.Since(time_start).Milliseconds()) // 计算请求结束时间
 		if err != nil {
-			log.Println("请求失败:", err.Error())
+			log.Println("请求失败:", url, err.Error())
 			r.Resp = resp
 			return r, req, err
 		}
