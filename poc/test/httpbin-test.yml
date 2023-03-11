@@ -5,7 +5,7 @@ set:
   var2: md5('123456')
 
 payloads:
-#  continue: true
+  continue: true
   payloads:
     var: base64('abc')
     var: md5('123456')
@@ -34,16 +34,12 @@ rules:
 #      search: '"<title>(?P<title>.+?)</title>".bsubmatch(response.body)'
 #      title: response.headers["Content-Type"]
       reptitle:
-        '"123123"'
+        '"测试"'
 #      adfbv: access_code
 expression: get() && post()
 detail:
   author: |
-    "'青木'"
+    '青木'
   links:
     - https://github.com/th3gundy/CVE-2019-7192_QNAP_Exploit
     - http://github.com/qmdemon/qingmu
-  description:
-    1. 限制上传后缀名
-    2. 对每一次请求都设置一个token
-    3. 对上传的目录设置禁止执行权限

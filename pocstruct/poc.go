@@ -11,8 +11,8 @@ type Poc struct {
 	Set        yaml.MapSlice   `yaml:"set"`
 	Payloads   Payloads        `yaml:"payloads"`
 	Rules      map[string]Rule `yaml:"rules"`
-	Detail     Detail          `yaml:"detail"`
 	Expression string          `yaml:"expression"`
+	Detail     Detail          `yaml:"detail"`
 }
 
 type Payloads struct {
