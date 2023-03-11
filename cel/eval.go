@@ -196,8 +196,9 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 	//rule.Request.Path = path
 	//rule.Request.Body = body
 
-	resp, req, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rep)
+	resp, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rep)
 	defer fasthttp.ReleaseResponse(resp.Resp) //在此释放resp资源
+	defer fasthttp.ReleaseRequest(resp.Req)   //释放req资源
 
 	// 重新赋值poc中的变量，让下一个payload可以获取到{{}}
 	//fmt.Println(headers)
@@ -225,7 +226,7 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 		return false
 	}
 
-	pbresp, err := proto.GetResponse(resp, req)
+	pbresp, err := proto.GetResponse(resp)
 	if err != nil {
 
 		log.Println("生成protoResponse错误：", err)
@@ -233,7 +234,7 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 	}
 	celVarMap["response"] = pbresp
 
-	pbreq, err := proto.GetRequest(req)
+	pbreq, err := proto.GetRequest(resp.Req)
 	if err != nil {
 
 		log.Println("生成protoRequest错误：", err)

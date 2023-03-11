@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func GetResponse(resp httpclient.Response, req *fasthttp.Request) (*Response, error) {
+func GetResponse(resp httpclient.Response) (*Response, error) {
 	var pbresp Response
 
 	pbresp.Raw = []byte(resp.Resp.String())
@@ -36,7 +36,7 @@ func GetResponse(resp httpclient.Response, req *fasthttp.Request) (*Response, er
 		pbresp.Title = []byte(t[1])
 	}
 
-	pbresp.Url = GetUrlType(req.URI())
+	pbresp.Url = GetUrlType(resp.Req.URI())
 
 	respheaders, err := httpclient.GetResponseHeaders(resp.Resp.String())
 	if err != nil {

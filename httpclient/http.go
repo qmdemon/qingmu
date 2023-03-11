@@ -19,18 +19,20 @@ import (
 	"time"
 )
 
+// 用于保存当前请求以及响应
 type Response struct {
 	Resp    *fasthttp.Response
-	Latency int32
+	Req     *fasthttp.Request
+	Latency int32 //请求响应时间
 }
 
-func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, rep *report.Report) (r Response, req *fasthttp.Request, err error) {
+func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, rep *report.Report) (r Response, err error) {
 
 	addr = strings.TrimSpace(addr)
 
 	url := addr + pocRequest.Path
 
-	req = fasthttp.AcquireRequest()
+	req := fasthttp.AcquireRequest()
 	//defer fasthttp.ReleaseRequest(req) // 用完需要释放资源
 
 	req.Header.SetMethod(pocRequest.Method)
@@ -85,8 +87,9 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 		log.Println("请求失败:", err.Error())
 
 		r.Resp = resp
+		r.Req = req
 
-		return r, req, err
+		return r, err
 
 	} else {
 		// 请求开始时间
@@ -96,7 +99,8 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 		if err != nil {
 			log.Println("请求失败:", url, err.Error())
 			r.Resp = resp
-			return r, req, err
+			r.Req = req
+			return r, err
 		}
 	}
 	//fmt.Println(resp.StatusCode())
@@ -111,7 +115,8 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 		fmt.Println(resp.String())
 	}
 	r.Resp = resp
-	return r, req, nil
+	r.Req = req
+	return r, nil
 
 }
 
