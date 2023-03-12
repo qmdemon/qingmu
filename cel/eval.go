@@ -196,7 +196,7 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 	//rule.Request.Path = path
 	//rule.Request.Body = body
 
-	resp, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rep)
+	resp, err := httpclient.HttpRequest(addr, rulereq, rule.Expression, rule.Description, rep)
 	defer fasthttp.ReleaseResponse(resp.Resp) //在此释放resp资源
 	defer fasthttp.ReleaseRequest(resp.Req)   //释放req资源
 

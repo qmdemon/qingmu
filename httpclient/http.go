@@ -26,7 +26,7 @@ type Response struct {
 	Latency int32 //请求响应时间
 }
 
-func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, rep *report.Report) (r Response, err error) {
+func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, Description string, rep *report.Report) (r Response, err error) {
 
 	addr = strings.TrimSpace(addr)
 
@@ -104,7 +104,7 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, r
 		}
 	}
 	//fmt.Println(resp.StatusCode())
-	rep.SetVulInfo(req.String(), resp.String(), Expression)
+	rep.SetVulInfo(Description, req.String(), resp.String(), Expression)
 	if global.IsShowPath {
 		fmt.Println(pocRequest.Method, url)
 	}

@@ -21,9 +21,10 @@ type Payloads struct {
 }
 
 type Rule struct {
-	Request    Request       `yaml:"request"`
-	Expression string        `yaml:"expression"`
-	OutPut     yaml.MapSlice `yaml:"output"`
+	Request     Request       `yaml:"request"`
+	Expression  string        `yaml:"expression"`
+	OutPut      yaml.MapSlice `yaml:"output"`
+	Description string        `yaml:"description"`
 }
 
 type Request struct {

@@ -17,9 +17,10 @@ type VulMap struct {
 }
 
 type ReqResp struct {
-	Req        string
-	Resp       string
-	Expression string
+	Description string
+	Req         string
+	Resp        string
+	Expression  string
 }
 
 //func (r Report) Output() string {
@@ -28,10 +29,10 @@ type ReqResp struct {
 //}
 
 // 设置漏洞详情
-func (r *Report) SetVulInfo(req string, resp string, Expression string) {
+func (r *Report) SetVulInfo(description, req string, resp string, Expression string) {
 
 	r.Vulmap[0].Vul = append(r.Vulmap[0].Vul, ReqResp{
-		req, resp, Expression,
+		description, req, resp, Expression,
 	})
 }
 

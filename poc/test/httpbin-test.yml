@@ -21,6 +21,8 @@ rules:
         Content-Type: application/json
       body: '{"username":"test","password":"123456"}'
     expression: response.status == 200
+    description: |
+      用于发送测试post请求
   get:
     request:
       cache: true
@@ -36,6 +38,8 @@ rules:
       reptitle:
         '"测试"'
 #      adfbv: access_code
+    description: |
+      用于发送测试get请求
 expression: get() && post()
 detail:
   author: |

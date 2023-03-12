@@ -145,6 +145,26 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 			run.Properties().SetBold(true)
 			run.AddText(fmt.Sprintf("发送第%d次请求:", j+1))
 
+			para = doc.AddParagraph()
+			//para.Properties().SetFirstLineIndent(0.5 * measurement.Inch)  //空格
+			//run.Properties().SetBold(true)
+			run = para.AddRun()
+			run.Properties().SetBold(true)
+			run.Properties().SetSize(11)
+			run.AddText("请求描述")
+
+			des := strings.Split(key.Description, "\n")
+			//设置正文
+			for _, d := range des {
+				para = doc.AddParagraph()
+				run = para.AddRun()
+
+				run.Properties().SetBold(true)
+				run.Properties().SetSize(9)
+				run.Properties().SetColor(color.Blue)
+				run.AddText(d)
+			}
+
 			//设置正文
 			para = doc.AddParagraph()
 			//para.Properties().SetFirstLineIndent(0.5 * measurement.Inch)  //空格
