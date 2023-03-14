@@ -5,7 +5,7 @@ set:
   var2: md5('123456')
 
 payloads:
-  continue: true
+#  continue: true
   payloads:
     var: base64('abc')
     var: md5('123456')
@@ -28,6 +28,7 @@ rules:
       cache: true
       method: GET
       path: /get?key={{var2}}
+      follow_redirects: true
       headers:
         user-agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
         tst: '{{var}}'

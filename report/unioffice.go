@@ -174,19 +174,21 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 			run.Properties().SetSize(11)
 			run.AddText("请求数据包")
 
-			//设置正文
-			para = doc.AddParagraph()
-			//para.Properties().SetFirstLineIndent(0.5 * measurement.Inch)  //空格
-			run = para.AddRun()
-			run.Properties().SetBold(true)
-			run.Properties().SetSize(9)
-			run.Properties().SetColor(color.Blue)
-
 			// 使能够在docx文档中打印的换行
 			req := strings.ReplaceAll(key.Req, "\n", "\r\n")
 			req = strings.ReplaceAll(req, "\r\r\n", "\r\n")
 
-			run.AddText(req)
+			reqlist := strings.Split(req, "\r\n")
+
+			for _, reql := range reqlist {
+				para = doc.AddParagraph()
+				run = para.AddRun()
+
+				run.Properties().SetBold(true)
+				run.Properties().SetSize(9)
+				run.Properties().SetColor(color.Blue)
+				run.AddText(reql)
+			}
 
 			doc.AddParagraph().AddRun().AddText("") //添加空行
 			//设置正文
@@ -198,17 +200,20 @@ func UniofficeOutPutDocx(rep Report, wg *sync.WaitGroup) {
 			run.Properties().SetSize(11)
 			run.AddText("请求响应包")
 
-			//设置正文
-			para = doc.AddParagraph()
-			//para.Properties().SetFirstLineIndent(0.5 * measurement.Inch)  //空格
-			run = para.AddRun()
-			run.Properties().SetBold(true)
-			run.Properties().SetSize(9)
-			run.Properties().SetColor(color.Blue)
-
 			resp := strings.ReplaceAll(key.Resp, "\n", "\r\n")
 			resp = strings.ReplaceAll(resp, "\r\r\n", "\r\n")
-			run.AddText(resp)
+
+			resplist := strings.Split(resp, "\r\n")
+
+			for _, respl := range resplist {
+				para = doc.AddParagraph()
+				run = para.AddRun()
+
+				run.Properties().SetBold(true)
+				run.Properties().SetSize(9)
+				run.Properties().SetColor(color.Blue)
+				run.AddText(respl)
+			}
 
 			doc.AddParagraph().AddRun().AddText("") //添加空行
 			//设置正文

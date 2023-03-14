@@ -148,6 +148,8 @@ func EvalRule(addr string, rule pocstruct.Rule, c CustomLib, celVarMap map[strin
 		FollowRedirects: rule.Request.FollowRedirects,
 	}
 
+	//fmt.Println(rulereq.FollowRedirects)
+
 	// 先赋值
 	for k2, v2 := range rule.Request.Headers {
 		rulereq.Headers[k2] = v2
