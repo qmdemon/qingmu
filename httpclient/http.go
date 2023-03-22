@@ -73,6 +73,14 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, D
 			log.Fatalln("代理格式设置错误")
 		}
 	}
+	// 显示请求
+	if global.IsShowPath {
+		fmt.Println(pocRequest.Method, url)
+	}
+	if global.IsShowRequest {
+		fmt.Println(req.String())
+	}
+	
 
 	// 判断是否跟随重定向
 	if pocRequest.FollowRedirects {
@@ -104,16 +112,14 @@ func HttpRequest(addr string, pocRequest pocstruct.Request, Expression string, D
 		}
 	}
 	//fmt.Println(resp.StatusCode())
-	rep.SetVulInfo(Description, req.String(), resp.String(), Expression)
-	if global.IsShowPath {
-		fmt.Println(pocRequest.Method, url)
-	}
-	if global.IsShowRequest {
-		fmt.Println(req.String())
-	}
+	
+	// 显示响应
 	if global.IsShowResponse {
 		fmt.Println(resp.String())
 	}
+	
+	rep.SetVulInfo(Description, req.String(), resp.String(), Expression)
+	
 	r.Resp = resp
 	r.Req = req
 	return r, nil
